@@ -82,6 +82,8 @@ class Alvo:
     def __init__(self):
         self.x0, self.y0 = 500, 500
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
+
+        self.aleatorizar_posicao()
     
     def resetar(self):
         self.x0, self.y0 = 500, 500
@@ -126,7 +128,7 @@ def resetar_inicio():
 
 class Tentativas:
     def __init__(self):
-        self.tentativas = 0
+        self.tentativas = -1
         self.raio = 10
         self.borda = 1
         self.origem = (30, 30)
@@ -140,11 +142,25 @@ class Tentativas:
 tentativas = Tentativas()        
 
 while loop:
+    tela.fill("#202020")
+
+    while (tentativas.tentativas == -1):
+        texto = PEQUENA_FONTE.render(f"Aperte para iniciar", True, "white")
+        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.5*ALTURA))
+        tela.blit(texto, texto_retangulo)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+                tentativas.tentativas = 0
+            if event.type == pygame.KEYDOWN:
+                tentativas.tentativas = 0
+        
     dt = clock.tick(120) / 350
     if (em_movimento and not pausado):
         t += dt
-
-    tela.fill("#202020")
 
     tentativas.mostrar()
 
@@ -176,9 +192,11 @@ while loop:
             if event.key == pygame.K_r:
                 # Reseta o jogo
                 resetar_inicio()
+                alvo.aleatorizar_posicao()
+                tentativas.tentativas = 0
+
                 acertou = False
                 em_movimento = False
-                alvo.aleatorizar_posicao()
 
             elif event.key == pygame.K_BACKSPACE:
                 # Volta objeto para origem
@@ -216,6 +234,18 @@ while loop:
         tentativas.tentativas += 1
         t = 0
         em_movimento = False
+
+    if (tentativas.tentativas == 3):
+        if (acertou):
+            texto = PEQUENA_FONTE.render(f"Ganhou!", True, "white")
+            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
+            tela.blit(texto, texto_retangulo)
+        else:
+            texto = PEQUENA_FONTE.render(f"Perdeu!", True, "white")
+            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
+            tela.blit(texto, texto_retangulo)
+            
+
 
     # em_movimento = objeto.naTela()
 
