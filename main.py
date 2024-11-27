@@ -31,8 +31,9 @@ class Objeto:
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
 
     def resetar(self):
-        self.x0, self.y0 = 0, ALTURA
-        self.vx, self.vy = 300, -500
+        self.__init__
+    
+    def voltar_origem(self):
         self.x, self.y = self.x0, self.y0
 
     def desenhar(self):
@@ -124,7 +125,7 @@ def resetar_inicio():
     t = 0
 
 while loop:
-    dt = clock.tick(60) / 1000
+    dt = clock.tick(120) / 350
     if (em_movimento and not pausado):
         t += dt
 
@@ -164,7 +165,8 @@ while loop:
 
             elif event.key == pygame.K_BACKSPACE:
                 # Volta objeto para origem
-                resetar_inicio()
+                objeto.voltar_origem()
+                t = 0
                 acertou = False
                 em_movimento = False
 
@@ -191,7 +193,9 @@ while loop:
         objeto.atualizar(t)
 
     if (not objeto.naTela()):
-        resetar_inicio()
+        # resetar_inicio()
+        objeto.voltar_origem()
+        t = 0
         em_movimento = False
 
     # em_movimento = objeto.naTela()
@@ -204,6 +208,7 @@ while loop:
     pygame.display.update()
     pygame.display.flip()
 
-    clock.tick(60)
+    clock.tick(120)
+
 
 pygame.quit()
