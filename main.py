@@ -124,12 +124,29 @@ def resetar_inicio():
     global t
     t = 0
 
+class Tentativas:
+    def __init__(self):
+        self.tentativas = 0
+        self.raio = 10
+        self.borda = 1
+        self.origem = (30, 30)
+
+    def mostrar(self):
+        for i in range(0, 3):
+            preencher = 0 if i < self.tentativas else self.borda
+            pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
+
+    
+tentativas = Tentativas()        
+
 while loop:
     dt = clock.tick(120) / 350
     if (em_movimento and not pausado):
         t += dt
 
     tela.fill("#202020")
+
+    tentativas.mostrar()
 
     if (not em_movimento):
         texto = PEQUENA_FONTE.render(f"Configure as condições iniciais", True, "white")
@@ -166,6 +183,7 @@ while loop:
             elif event.key == pygame.K_BACKSPACE:
                 # Volta objeto para origem
                 objeto.voltar_origem()
+                tentativas.tentativas = 0
                 t = 0
                 acertou = False
                 em_movimento = False
@@ -195,6 +213,7 @@ while loop:
     if (not objeto.naTela()):
         # resetar_inicio()
         objeto.voltar_origem()
+        tentativas.tentativas += 1
         t = 0
         em_movimento = False
 
