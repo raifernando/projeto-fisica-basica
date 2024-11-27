@@ -24,11 +24,19 @@ class Objeto:
         self.x0, self.y0 = 0, ALTURA
         self.vx, self.vy = 300, -500
         self.x, self.y = self.x0, self.y0
+        self.angulo = 45
+        self.angulo_tamanho = 100
         self.gravidade = 200
         self.raio = 20
         self.cor = "purple"
 
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
+
+    def desenhar_angulo(self):
+        novo_x = self.x0 + self.angulo_tamanho*np.cos(np.radians(self.angulo))
+        novo_y = self.y0 - self.angulo_tamanho*np.sin(np.radians(self.angulo))
+
+        self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 4)
 
     def resetar(self):
         self.__init__
@@ -67,6 +75,11 @@ class Objeto:
         pos = INFO_FONTE.render(texto_pos, True, "white")
         pos_retangulo = pos.get_rect(center=(0.95*LARGURA,0.55*ALTURA))
         tela.blit(pos, pos_retangulo)
+
+        texto_angulo = f"angulo: {self.angulo % 360}°"
+        angulo = INFO_FONTE.render(texto_angulo, True, "white")
+        angulo_retangulo = angulo.get_rect(center=(0.945*LARGURA,0.30*ALTURA))
+        tela.blit(angulo, angulo_retangulo)
 
         tempo = INFO_FONTE.render(f"t:{t}", True, "white")
         tempo_retangulo = tempo.get_rect(center=(0.95*LARGURA,0.35*ALTURA))
@@ -165,6 +178,9 @@ while loop:
     tentativas.mostrar()
 
     if (not em_movimento):
+        objeto.desenhar_angulo()
+
+    if (not em_movimento):
         texto = PEQUENA_FONTE.render(f"Configure as condições iniciais", True, "white")
         texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.15*ALTURA))
         tela.blit(texto, texto_retangulo)
@@ -188,6 +204,11 @@ while loop:
                     objeto.vx -= 20
                 elif event.key == pygame.K_RIGHT:
                     objeto.vx += 20
+                elif event.key == pygame.K_a:
+                    objeto.angulo = min(objeto.angulo + 5, 90)
+                elif event.key == pygame.K_d:
+                    objeto.angulo = max(objeto.angulo - 5, 0)
+
             
             if event.key == pygame.K_r:
                 # Reseta o jogo
