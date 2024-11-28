@@ -22,7 +22,9 @@ pygame.display.set_caption("física-basica")
 
 class Objeto:
     def __init__(self):
-        self.angulo = 0
+        self.angulo = 0.0 # radiano
+        self.tamanho_seta = 100
+
         self.x0, self.y0 = 200, 550
         self.vx, self.vy = 0, 0
         self.x, self.y = self.x0, self.y0
@@ -33,6 +35,12 @@ class Objeto:
 
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
 
+    def desenhar_angulo(self):
+        novo_x = self.x0 + self.tamanho_seta*np.cos(self.angulo)
+        novo_y = self.y0 + self.tamanho_seta*np.sin(self.angulo)
+
+        self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 4)
+    
     def resetar(self):
         self.__init__
     
@@ -57,7 +65,7 @@ class Objeto:
         tela.blit(origem, origem_retangulo)
 
         angulo_graus = 0 - math.degrees(self.angulo)
-        texto_angulo = "angulo: " + str(angulo_graus)
+        texto_angulo = "angulo: " + str(angulo_graus) + "°"
         angulo = INFO_FONTE.render(texto_angulo, True, "white")
         angulo_retangulo = angulo.get_rect(center=(0.95*LARGURA,0.45*ALTURA))
         tela.blit(angulo, angulo_retangulo)
@@ -156,7 +164,7 @@ def resetar_inicio():
 
 class Tentativas:
     def __init__(self):
-        self.tentativas = 0
+        self.tentativas = -1
         self.raio = 10
         self.borda = 1
         self.origem = (30, 30)
@@ -172,11 +180,25 @@ tentativas = Tentativas()
 mouse_apertado = False
 
 while loop:
+    tela.fill("#202020")
+
+    while (tentativas.tentativas == -1):
+        texto = PEQUENA_FONTE.render(f"Aperte para iniciar", True, "white")
+        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.5*ALTURA))
+        tela.blit(texto, texto_retangulo)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+                tentativas.tentativas = 0
+            if event.type == pygame.KEYDOWN:
+                tentativas.tentativas = 0
+        
     dt = clock.tick(120) / 350
     if (em_movimento and not pausado):
         t += dt
-
-    tela.fill("#202020")
 
     tentativas.mostrar()
 
@@ -184,6 +206,8 @@ while loop:
         texto = PEQUENA_FONTE.render(f"Configure as condições iniciais", True, "white")
         texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.15*ALTURA))
         tela.blit(texto, texto_retangulo)
+
+        objeto.desenhar_angulo()
 
     if (acertou):
         texto = PEQUENA_FONTE.render("Acertou", True, "white")
@@ -205,13 +229,19 @@ while loop:
                     objeto.vx -= 20
                 elif event.key == pygame.K_RIGHT:
                     objeto.vx += 20
+                elif event.key == pygame.K_a:
+                    objeto.angulo = (objeto.angulo + np.radians(5))
+                elif event.key == pygame.K_d:
+                    objeto.angulo = (objeto.angulo - np.radians(5))
             
             if event.key == pygame.K_r:
                 # Reseta o jogo
                 resetar_inicio()
+                alvo.aleatorizar_posicao()
+                tentativas.tentativas = 0
+
                 acertou = False
                 em_movimento = False
-                alvo.aleatorizar_posicao()
 
             elif event.key == pygame.K_BACKSPACE:
                 # Volta objeto para origem
@@ -265,6 +295,16 @@ while loop:
         tentativas.tentativas += 1
         t = 0
         em_movimento = False
+
+    if (tentativas.tentativas == 3):
+        if (acertou):
+            texto = PEQUENA_FONTE.render(f"Ganhou!", True, "white")
+            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
+            tela.blit(texto, texto_retangulo)
+        else:
+            texto = PEQUENA_FONTE.render(f"Perdeu!", True, "white")
+            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
+            tela.blit(texto, texto_retangulo)
 
     # em_movimento = objeto.naTela()
 
