@@ -1,6 +1,8 @@
 import pygame
 import numpy as np
 import random
+import math
+from sympy import Line
 
 pygame.init()
 
@@ -20,23 +22,16 @@ pygame.display.set_caption("física-basica")
 
 class Objeto:
     def __init__(self):
-        #! Adicionar ângulo
-        self.x0, self.y0 = 0, ALTURA
-        self.vx, self.vy = 300, -500
+        self.angulo = 0
+        self.x0, self.y0 = 200, 550
+        self.vx, self.vy = 0, 0
         self.x, self.y = self.x0, self.y0
-        self.angulo = 45
-        self.angulo_tamanho = 100
+        self.arrastar = False
         self.gravidade = 200
         self.raio = 20
         self.cor = "purple"
 
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
-
-    def desenhar_angulo(self):
-        novo_x = self.x0 + self.angulo_tamanho*np.cos(np.radians(self.angulo))
-        novo_y = self.y0 - self.angulo_tamanho*np.sin(np.radians(self.angulo))
-
-        self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 4)
 
     def resetar(self):
         self.__init__
@@ -54,32 +49,34 @@ class Objeto:
 
         self.desenhar()
 
-    #! Textos temporários, pra mostrar as velocidades. Precisa adicionar o ângulo inicial
+    #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
         texto_origem = f"O({self.x0},{self.y0})"
         origem = INFO_FONTE.render(texto_origem, True, "white")
         origem_retangulo = origem.get_rect(center=(0.95*LARGURA,0.40*ALTURA))
         tela.blit(origem, origem_retangulo)
 
+        angulo_graus = 0 - math.degrees(self.angulo)
+        texto_angulo = "angulo: " + str(angulo_graus)
+        angulo = INFO_FONTE.render(texto_angulo, True, "white")
+        angulo_retangulo = angulo.get_rect(center=(0.95*LARGURA,0.45*ALTURA))
+        tela.blit(angulo, angulo_retangulo)
+
+
         texto_vx = "vx: " + str(self.vx)
         velocidade_vx = INFO_FONTE.render(texto_vx, True, "white")
-        velocidade_vx_retangulo = velocidade_vx.get_rect(center=(0.95*LARGURA,0.45*ALTURA))
+        velocidade_vx_retangulo = velocidade_vx.get_rect(center=(0.95*LARGURA,0.50*ALTURA))
         tela.blit(velocidade_vx, velocidade_vx_retangulo)
 
         texto_vy = "vy: " + str(self.vy)
         velocidade_vy = INFO_FONTE.render(texto_vy, True, "white")
-        velocidade_vy_retangulo = velocidade_vy.get_rect(center=(0.95*LARGURA,0.5*ALTURA))
+        velocidade_vy_retangulo = velocidade_vy.get_rect(center=(0.95*LARGURA,0.55*ALTURA))
         tela.blit(velocidade_vy, velocidade_vy_retangulo)
 
         texto_pos = f"x:{self.x} y:{self.y}"
         pos = INFO_FONTE.render(texto_pos, True, "white")
-        pos_retangulo = pos.get_rect(center=(0.95*LARGURA,0.55*ALTURA))
+        pos_retangulo = pos.get_rect(center=(0.95*LARGURA,0.60*ALTURA))
         tela.blit(pos, pos_retangulo)
-
-        texto_angulo = f"angulo: {self.angulo % 360}°"
-        angulo = INFO_FONTE.render(texto_angulo, True, "white")
-        angulo_retangulo = angulo.get_rect(center=(0.945*LARGURA,0.30*ALTURA))
-        tela.blit(angulo, angulo_retangulo)
 
         tempo = INFO_FONTE.render(f"t:{t}", True, "white")
         tempo_retangulo = tempo.get_rect(center=(0.95*LARGURA,0.35*ALTURA))
@@ -91,12 +88,30 @@ class Objeto:
         return False
 
 
+    def arrastar_inicio(self):
+       self.arrastar = True
+
+    def arrastar_fim(self, encerrar=False):
+        self.arrastar = encerrar
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_x, mouse_y = mouse_pos
+
+        dx = self.x - mouse_x
+        dy = self.y - mouse_y
+        
+        self.angulo = math.atan2(dy, dx)  
+        dist = math.hypot(dx, dy)
+
+        #formula obtida da conservacao de energia: o valor de cima é a constantes elastica, o de baixo a massa
+        velocidade = dist*np.sqrt(3/0.5) 
+        self.vx = velocidade*math.cos(self.angulo)
+        self.vy = velocidade*math.sin(self.angulo)
+
+
 class Alvo:
     def __init__(self):
         self.x0, self.y0 = 500, 500
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
-
-        self.aleatorizar_posicao()
     
     def resetar(self):
         self.x0, self.y0 = 500, 500
@@ -141,7 +156,7 @@ def resetar_inicio():
 
 class Tentativas:
     def __init__(self):
-        self.tentativas = -1
+        self.tentativas = 0
         self.raio = 10
         self.borda = 1
         self.origem = (30, 30)
@@ -154,31 +169,16 @@ class Tentativas:
     
 tentativas = Tentativas()        
 
+mouse_apertado = False
+
 while loop:
-    tela.fill("#202020")
-
-    while (tentativas.tentativas == -1):
-        texto = PEQUENA_FONTE.render(f"Aperte para iniciar", True, "white")
-        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.5*ALTURA))
-        tela.blit(texto, texto_retangulo)
-
-        pygame.display.update()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                loop = False
-                tentativas.tentativas = 0
-            if event.type == pygame.KEYDOWN:
-                tentativas.tentativas = 0
-        
     dt = clock.tick(120) / 350
     if (em_movimento and not pausado):
         t += dt
 
-    tentativas.mostrar()
+    tela.fill("#202020")
 
-    if (not em_movimento):
-        objeto.desenhar_angulo()
+    tentativas.mostrar()
 
     if (not em_movimento):
         texto = PEQUENA_FONTE.render(f"Configure as condições iniciais", True, "white")
@@ -191,6 +191,7 @@ while loop:
         tela.blit(texto, texto_retangulo)
 
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             loop = False
         #! Essas mudanças so poderão acontecer antes do objeto ser "lançado"
@@ -204,20 +205,13 @@ while loop:
                     objeto.vx -= 20
                 elif event.key == pygame.K_RIGHT:
                     objeto.vx += 20
-                elif event.key == pygame.K_a:
-                    objeto.angulo = min(objeto.angulo + 5, 90)
-                elif event.key == pygame.K_d:
-                    objeto.angulo = max(objeto.angulo - 5, 0)
-
             
             if event.key == pygame.K_r:
                 # Reseta o jogo
                 resetar_inicio()
-                alvo.aleatorizar_posicao()
-                tentativas.tentativas = 0
-
                 acertou = False
                 em_movimento = False
+                alvo.aleatorizar_posicao()
 
             elif event.key == pygame.K_BACKSPACE:
                 # Volta objeto para origem
@@ -233,6 +227,22 @@ while loop:
             elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
                 if (t == 0):
                     em_movimento = True
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            objeto.arrastar_inicio()
+            objeto.arrastar_fim(False)
+            mouse_apertado = True
+
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if(t == 0):
+                objeto.arrastar_fim(True)
+                em_movimento = True
+            mouse_apertado = False
+
+    if mouse_apertado and not objeto.arrastar:
+        objeto.arrastar_fim(False)
+
 
     objeto.desenhar()
     alvo.desenhar()
@@ -255,18 +265,6 @@ while loop:
         tentativas.tentativas += 1
         t = 0
         em_movimento = False
-
-    if (tentativas.tentativas == 3):
-        if (acertou):
-            texto = PEQUENA_FONTE.render(f"Ganhou!", True, "white")
-            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
-            tela.blit(texto, texto_retangulo)
-        else:
-            texto = PEQUENA_FONTE.render(f"Perdeu!", True, "white")
-            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
-            tela.blit(texto, texto_retangulo)
-            
-
 
     # em_movimento = objeto.naTela()
 
