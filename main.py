@@ -64,7 +64,7 @@ class Objeto:
 
     def aleatorizar_posicao(self):
         self.x0 = random.randint(0.2*LARGURA, 0.8*LARGURA)
-        self.y0 = random.randint(0.2*ALTURA, 0.8*ALTURA)
+        self.y0 = random.randint(int(0.3*ALTURA), int(0.7*ALTURA))
 
         self.x, self.y = self.x0, self.y0
 
@@ -80,12 +80,26 @@ class Objeto:
     def desenhar(self):
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x, self.y), self.raio)
 
+        # Plataforma
+        pygame.draw.line(tela, self.cor, (self.x0-30, self.y0+self.raio), (self.x0+30, self.y0+self.raio), 5)
+
+
     def atualizar_posicao(self, t):
         # Função teste. Mudar para lançamento oblíquo
         self.x = self.x0 + self.vx * t
         self.y = self.y0 + self.vy * t + 0.5 * self.gravidade * (t ** 2)
 
         self.desenhar()
+
+    def checar_colisao(self):
+        esquerda, direita = self.x0-30, self.x0+30
+        altura = self.y0+self.raio
+
+        print(esquerda, direita, altura, self.x, self.y)
+
+        if (esquerda <= self.x <= direita and altura - 5 <= self.y <= altura + 5):
+            return True
+        return False
 
     def atualizar(self, jogo, alvo):
         if(alvo.checar_proximidade(self.x, self.y) and not jogo.acertou):
@@ -96,7 +110,7 @@ class Objeto:
         if (jogo.em_movimento and not jogo.pausado):
             self.atualizar_posicao(jogo.t)
 
-        if (not self.naTela()):
+        if (not self.naTela() or self.checar_colisao()):
             self.voltar_origem()
             jogo.t = 0
             jogo.em_movimento = False
@@ -144,7 +158,6 @@ class Objeto:
 class Alvo:
     def __init__(self):
         self.x0, self.y0 = 500, 500
-        self.aleatorizar_posicao()
         self.cor = "green"
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
     
@@ -155,9 +168,18 @@ class Alvo:
     def desenhar(self):
         pygame.draw.rect(tela, self.cor, self.rect)
 
-    def aleatorizar_posicao(self):
-        self.x0 = random.randint(0.1*LARGURA, 0.9*LARGURA)
-        self.y0 = random.randint(0.1*ALTURA, 0.9*ALTURA)
+    def aleatorizar_posicao(self, objeto:Objeto):
+        posicao = random.randint(1, 2)
+        if (posicao == 1): #cima
+            self.x0 = random.randint(0.1*LARGURA, 0.9*LARGURA)
+            self.y0 = random.randint(0.1*ALTURA, int(objeto.y0*0.95))
+        else:
+            esquerda = random.randint(0.1*LARGURA, max(0.1*LARGURA, int(objeto.x0) - 100))
+            direita = random.randint(max(0.9*LARGURA, int(objeto.x0) + 100), 0.9*LARGURA)
+
+            self.x0 = random.choice([esquerda, direita])
+            self.y0 = random.randint(int(objeto.y0*1.05), 0.9*ALTURA)
+        
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
 
     # Checa se o ponto (x, y) está a uma distância do alvo
@@ -195,13 +217,14 @@ class Jogo:
         self.menu = True # Menu inicial
         self.pausado = False # Não contabiliza o tempo
         self.em_movimento = False # Falso quando está configurando as condições iniciais
-
+    
         self.acertou = False # True se o objeto acertou o alvo
         self.mouse_apertado = False
 
         self.t = 0
         self.objeto = Objeto()
         self.alvo = Alvo()
+        self.alvo.aleatorizar_posicao(self.objeto)
         self.tentativas = Tentativas()
 
         self.placar = 0
@@ -291,7 +314,7 @@ class Jogo:
             return
         
         if (self.tentativas.tentativas >= 3 or self.acertou):
-            self.alvo.aleatorizar_posicao()
+            self.alvo.aleatorizar_posicao(self.objeto)
             self.objeto.aleatorizar_posicao()
             self.acertou = False
             self.tentativas.tentativas = 0
