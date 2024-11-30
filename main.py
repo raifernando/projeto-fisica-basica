@@ -52,6 +52,16 @@ class Objeto:
 
         self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 4)
     
+
+    def aleatorizar_posicao(self):
+        self.x0 = random.randint(0.2*LARGURA, 0.8*LARGURA)
+        self.y0 = random.randint(0.2*ALTURA, 0.8*ALTURA)
+
+        self.x, self.y = self.x0, self.y0
+
+        self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
+
+
     def resetar(self):
         self.__init__
     
@@ -69,8 +79,9 @@ class Objeto:
         self.desenhar()
 
     def atualizar(self, jogo, alvo):
-        if(alvo.checar_proximidade(self.x, self.y)):
+        if(alvo.checar_proximidade(self.x, self.y) and not jogo.acertou):
             jogo.acertou = True
+            jogo.placar += 1
         
         #! Por enquanto está pausado quando acerta o alvo, isso precisa mudar depois
         if (jogo.em_movimento and not jogo.pausado):
@@ -79,7 +90,7 @@ class Objeto:
         if (not self.naTela()):
             # resetar_inicio()
             self.voltar_origem()
-            jogo.tentativas.tentativas += 1
+            # jogo.tentativas.tentativas += 1
             jogo.t = 0
             jogo.em_movimento = False
 
@@ -145,6 +156,8 @@ class Objeto:
 class Alvo:
     def __init__(self):
         self.x0, self.y0 = 500, 500
+        self.aleatorizar_posicao()
+        self.cor = "green"
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
     
     def resetar(self):
@@ -152,7 +165,7 @@ class Alvo:
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
 
     def desenhar(self):
-        pygame.draw.rect(tela, "green", self.rect)
+        pygame.draw.rect(tela, self.cor, self.rect)
 
     def aleatorizar_posicao(self):
         self.x0 = random.randint(0.1*LARGURA, 0.9*LARGURA)
@@ -167,9 +180,11 @@ class Alvo:
             texto = INFO_FONTE.render("Acertou!", True, "white")
             texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.9*ALTURA))
             tela.blit(texto, texto_retangulo)
+            self.cor = "cyan"
 
             return True
-
+        
+        self.cor = "green"
         return False
     
 # objeto = Objeto()
@@ -190,7 +205,7 @@ class Alvo:
 
 class Tentativas:
     def __init__(self):
-        self.tentativas = -1
+        self.tentativas = 0
         self.raio = 10
         self.borda = 1
         self.origem = (30, 30)
@@ -274,16 +289,18 @@ class Jogo:
                 elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
                     if (self.t == 0):
                         self.em_movimento = True
+                        self.tentativas.tentativas += 1
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and not self.em_movimento:
                 self.objeto.arrastar_inicio()
                 self.objeto.arrastar_fim(False)
                 self.mouse_apertado = True
 
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and not self.em_movimento:
                 if(self.t == 0):
                     self.objeto.arrastar_fim(True)
                     self.em_movimento = True
+                    self.tentativas.tentativas += 1
                 self.mouse_apertado = False
 
         if self.mouse_apertado and not self.objeto.arrastar:
@@ -305,12 +322,10 @@ class Jogo:
         if (self.em_movimento):
             return
         
-        if (self.tentativas.tentativas <= 3):
-            if (self.acertou):
-                self.placar += 1
-                self.tentativas.tentativas = 0
-                self.acertou = False
-        else:
+        if (self.tentativas.tentativas >= 3 or self.acertou):
+            self.alvo.aleatorizar_posicao()
+            self.objeto.aleatorizar_posicao()
+            self.acertou = False
             self.tentativas.tentativas = 0
 
 
