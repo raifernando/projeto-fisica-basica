@@ -47,10 +47,26 @@ class Objeto:
         
 
     def desenhar_angulo(self):
+        self.tamanho_seta = min(90, max(40, math.pow(self.vx**2 + self.vy**2, 0.34)))
         novo_x = self.x0 + self.tamanho_seta*np.cos(self.angulo)
         novo_y = self.y0 + self.tamanho_seta*np.sin(self.angulo)
 
-        self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 4)
+        self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 5)
+
+        # Abas da seta do ângulo
+        tamanho_abas = 15
+        angulo_abas = np.radians(15)
+
+        esquerda_x = novo_x - tamanho_abas*np.cos(self.angulo + angulo_abas)
+        esquerda_y = novo_y - tamanho_abas*np.sin(self.angulo + angulo_abas)
+
+        pygame.draw.line(tela, self.cor, (novo_x, novo_y), (esquerda_x, esquerda_y), 5)
+
+        direita_x = novo_x - tamanho_abas*np.cos(self.angulo - angulo_abas)
+        direita_y = novo_y - tamanho_abas*np.sin(self.angulo - angulo_abas)
+
+        pygame.draw.line(tela, self.cor, (novo_x, novo_y), (direita_x, direita_y), 5)
+
     
 
     def aleatorizar_posicao(self):
