@@ -170,7 +170,8 @@ class Objeto:
         dist = math.hypot(dx, dy)
 
         #formula obtida da conservacao de energia: o valor de cima é a constantes elastica, o de baixo a massa
-        self.velocidade = dist*np.sqrt(3/0.5) 
+        self.velocidade = min(dist*np.sqrt(3/0.5), 600) 
+        
 
 
 class Alvo:
@@ -267,15 +268,6 @@ class Jogo:
                 if event.key == pygame.K_q:
                     self.loop_jogo = False
 
-                if not self.em_movimento:
-                    if event.key == pygame.K_UP:
-                        self.objeto.velocidade += 20
-                    elif event.key == pygame.K_DOWN:
-                        self.objeto.velocidade -= 20
-                    elif event.key == pygame.K_LEFT:
-                        self.objeto.angulo = (self.objeto.angulo - np.radians(5))
-                    elif event.key == pygame.K_RIGHT:
-                        self.objeto.angulo = (self.objeto.angulo + np.radians(5))
                 
                 if event.key == pygame.K_r:
                     self.__init__()
@@ -307,6 +299,17 @@ class Jogo:
                     self.em_movimento = True
                     self.tentativas.tentativas += 1
                 self.mouse_apertado = False
+
+        keys = pygame.key.get_pressed()
+        if not self.em_movimento:
+            if keys[pygame.K_UP]:
+                self.objeto.velocidade = min(600, max(0, self.objeto.velocidade+3))
+            if keys[pygame.K_DOWN]:
+                self.objeto.velocidade = min(600, max(0, self.objeto.velocidade-3))
+            if keys[pygame.K_LEFT]:
+                self.objeto.angulo -= np.radians(1)
+            if keys[pygame.K_RIGHT]:
+                self.objeto.angulo += np.radians(1)
 
         if self.mouse_apertado and not self.objeto.arrastar:
             self.objeto.arrastar_fim(False)
