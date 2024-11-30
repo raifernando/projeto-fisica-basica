@@ -14,9 +14,19 @@ ALTURA = RESOLUCAO[1]
 INFO_FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/60))
 PEQUENA_FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/30))
 
+def mostrar_texto(tam, texto, x, y):
+    tamanhos = [10, 30, 60, 90]
+    FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/tamanhos[tam]))
+
+    t = FONTE.render(texto, True, "white")
+    t_r = t.get_rect(center=(x,y))
+    tela.blit(t, t_r)
+    # pygame.display.update()
+
+
 tela = pygame.display.set_mode(RESOLUCAO)
 clock = pygame.time.Clock()
-t = 0
+# t = 0
 
 pygame.display.set_caption("física-basica")
 
@@ -34,6 +44,7 @@ class Objeto:
         self.cor = "purple"
 
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
+        
 
     def desenhar_angulo(self):
         novo_x = self.x0 + self.tamanho_seta*np.cos(self.angulo)
@@ -50,12 +61,27 @@ class Objeto:
     def desenhar(self):
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x, self.y), self.raio)
 
-    def atualizar(self, t):
+    def atualizar_posicao(self, t):
         # Função teste. Mudar para lançamento oblíquo
         self.x = self.x0 + self.vx * t
         self.y = self.y0 + self.vy * t + 0.5 * self.gravidade * (t ** 2)
 
         self.desenhar()
+
+    def atualizar(self, jogo, alvo):
+        if(alvo.checar_proximidade(self.x, self.y)):
+            jogo.acertou = True
+        
+        #! Por enquanto está pausado quando acerta o alvo, isso precisa mudar depois
+        if (jogo.em_movimento and not jogo.pausado):
+            self.atualizar_posicao(jogo.t)
+
+        if (not self.naTela()):
+            # resetar_inicio()
+            self.voltar_origem()
+            jogo.tentativas.tentativas += 1
+            jogo.t = 0
+            jogo.em_movimento = False
 
     #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
@@ -86,7 +112,7 @@ class Objeto:
         pos_retangulo = pos.get_rect(center=(0.95*LARGURA,0.60*ALTURA))
         tela.blit(pos, pos_retangulo)
 
-        tempo = INFO_FONTE.render(f"t:{t}", True, "white")
+        tempo = INFO_FONTE.render(f"t:{tempo}", True, "white")
         tempo_retangulo = tempo.get_rect(center=(0.95*LARGURA,0.35*ALTURA))
         tela.blit(tempo, tempo_retangulo)
 
@@ -146,21 +172,21 @@ class Alvo:
 
         return False
     
-objeto = Objeto()
-alvo = Alvo()
+# objeto = Objeto()
+# alvo = Alvo()
 
 #-- Lógica do loop do jogo (estados)
-loop = True
-pausado = False # Não contabiliza o tempo
-em_movimento = False # Falso quando está configurando as condições iniciais
+# loop = True
+# pausado = False # Não contabiliza o tempo
+# em_movimento = False # Falso quando está configurando as condições iniciais
 
-acertou = False # True se o objeto acertou o alvo
+# acertou = False # True se o objeto acertou o alvo
 
 # Mudar essa lógica
-def resetar_inicio():
-    objeto.resetar()
-    global t
-    t = 0
+# def resetar_inicio():
+#     objeto.resetar()
+#     global t
+#     t = 0
 
 class Tentativas:
     def __init__(self):
@@ -175,148 +201,157 @@ class Tentativas:
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
 
     
-tentativas = Tentativas()        
+# tentativas = Tentativas()        
 
-mouse_apertado = False
+DEBUG = False
 
-while loop:
-    tela.fill("#202020")
+class Jogo:
+    def __init__(self):
+        #-- Lógica do loop do jogo (estados)
+        self.loop_jogo = True
+        self.menu = True # Menu inicial
+        self.pausado = False # Não contabiliza o tempo
+        self.em_movimento = False # Falso quando está configurando as condições iniciais
 
-    while (tentativas.tentativas == -1):
-        texto = PEQUENA_FONTE.render(f"Aperte para iniciar", True, "white")
-        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.5*ALTURA))
-        tela.blit(texto, texto_retangulo)
+        self.acertou = False # True se o objeto acertou o alvo
+        self.mouse_apertado = False
 
+        self.t = 0
+        self.objeto = Objeto()
+        self.alvo = Alvo()
+        self.tentativas = Tentativas()
+
+        self.placar = 0
+
+    def mostrar_menu(self):
+        mostrar_texto(1, "AperteSD para iniciar", 0.5*LARGURA, 0.5*ALTURA)
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                loop = False
-                tentativas.tentativas = 0
+                self.loop_jogo = False
+                self.menu = False
+                return False
             if event.type == pygame.KEYDOWN:
-                tentativas.tentativas = 0
+                self.menu = False
+
+    def input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.loop_jogo = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    self.loop_jogo = False
+
+                if not self.em_movimento:
+                    if event.key == pygame.K_UP:
+                        self.objeto.vy += 20
+                    elif event.key == pygame.K_DOWN:
+                        self.objeto.vy -= 20
+                    elif event.key == pygame.K_LEFT:
+                        self.objeto.vx -= 20
+                    elif event.key == pygame.K_RIGHT:
+                        self.objeto.vx += 20
+                    elif event.key == pygame.K_a:
+                        self.objeto.angulo = (self.objeto.angulo + np.radians(5))
+                    elif event.key == pygame.K_d:
+                        self.objeto.angulo = (self.objeto.angulo - np.radians(5))
+                
+                if event.key == pygame.K_r:
+                    self.__init__()
+
+                elif event.key == pygame.K_BACKSPACE:
+                    # Volta objeto para origem
+                    self.objeto.voltar_origem()
+                    self.tentativas.tentativas = 0
+                    self.t = 0
+                    self.acertou = False
+                    self.em_movimento = False
+
+                elif event.key == pygame.K_p:
+                    self.pausado = not self.pausado
+
+                elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
+                    if (self.t == 0):
+                        self.em_movimento = True
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.objeto.arrastar_inicio()
+                self.objeto.arrastar_fim(False)
+                self.mouse_apertado = True
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if(self.t == 0):
+                    self.objeto.arrastar_fim(True)
+                    self.em_movimento = True
+                self.mouse_apertado = False
+
+        if self.mouse_apertado and not self.objeto.arrastar:
+            self.objeto.arrastar_fim(False)
+
+    def informacoes(self):
+        self.objeto.desenhar()
+        self.alvo.desenhar()
+        self.objeto.mostrar_informacoes(self.t)
+        self.tentativas.mostrar()
+
+        if (not self.em_movimento):
+            self.objeto.desenhar_angulo()
+
+        mostrar_texto(1, f"{self.placar}", 60, 80)
+
+
+    def verificar_jogada(self):
+        if (self.em_movimento):
+            return
         
-    dt = clock.tick(120) / 350
-    if (em_movimento and not pausado):
-        t += dt
-
-    tentativas.mostrar()
-
-    if (not em_movimento):
-        texto = PEQUENA_FONTE.render(f"Configure as condições iniciais", True, "white")
-        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.15*ALTURA))
-        tela.blit(texto, texto_retangulo)
-
-        objeto.desenhar_angulo()
-
-    if (acertou):
-        texto = PEQUENA_FONTE.render("Acertou", True, "white")
-        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.5*ALTURA))
-        tela.blit(texto, texto_retangulo)
-
-    for event in pygame.event.get():
-
-        if event.type == pygame.QUIT:
-            loop = False
-        #! Essas mudanças so poderão acontecer antes do objeto ser "lançado"
-        if event.type == pygame.KEYDOWN:
-            if not em_movimento:
-                if event.key == pygame.K_UP:
-                    objeto.vy += 20
-                elif event.key == pygame.K_DOWN:
-                    objeto.vy -= 20
-                elif event.key == pygame.K_LEFT:
-                    objeto.vx -= 20
-                elif event.key == pygame.K_RIGHT:
-                    objeto.vx += 20
-                elif event.key == pygame.K_a:
-                    objeto.angulo = (objeto.angulo + np.radians(5))
-                elif event.key == pygame.K_d:
-                    objeto.angulo = (objeto.angulo - np.radians(5))
-            
-            if event.key == pygame.K_r:
-                # Reseta o jogo
-                resetar_inicio()
-                alvo.aleatorizar_posicao()
-                tentativas.tentativas = 0
-
-                acertou = False
-                em_movimento = False
-
-            elif event.key == pygame.K_BACKSPACE:
-                # Volta objeto para origem
-                objeto.voltar_origem()
-                tentativas.tentativas = 0
-                t = 0
-                acertou = False
-                em_movimento = False
-
-            elif event.key == pygame.K_p:
-                pausado = not pausado
-
-            elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
-                if (t == 0):
-                    em_movimento = True
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            objeto.arrastar_inicio()
-            objeto.arrastar_fim(False)
-            mouse_apertado = True
-
-
-        if event.type == pygame.MOUSEBUTTONUP:
-            if(t == 0):
-                objeto.arrastar_fim(True)
-                em_movimento = True
-            mouse_apertado = False
-
-    if mouse_apertado and not objeto.arrastar:
-        objeto.arrastar_fim(False)
-
-
-    objeto.desenhar()
-    alvo.desenhar()
-    objeto.mostrar_informacoes(t)
-
-    texto = PEQUENA_FONTE.render(f"{em_movimento} {pausado}", True, "white")
-    texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.3*ALTURA))
-    tela.blit(texto, texto_retangulo)
-
-    if(alvo.checar_proximidade(objeto.x, objeto.y)):
-        acertou = True
-    
-    #! Por enquanto está pausado quando acerta o alvo, isso precisa mudar depois
-    if (em_movimento and not pausado):
-        objeto.atualizar(t)
-
-    if (not objeto.naTela()):
-        # resetar_inicio()
-        objeto.voltar_origem()
-        tentativas.tentativas += 1
-        t = 0
-        em_movimento = False
-
-    if (tentativas.tentativas == 3):
-        if (acertou):
-            texto = PEQUENA_FONTE.render(f"Ganhou!", True, "white")
-            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
-            tela.blit(texto, texto_retangulo)
+        if (self.tentativas.tentativas <= 3):
+            if (self.acertou):
+                self.placar += 1
+                self.tentativas.tentativas = 0
+                self.acertou = False
         else:
-            texto = PEQUENA_FONTE.render(f"Perdeu!", True, "white")
-            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.8*ALTURA))
-            tela.blit(texto, texto_retangulo)
+            self.tentativas.tentativas = 0
 
-    # em_movimento = objeto.naTela()
 
-    if (pausado):
-        texto = PEQUENA_FONTE.render("Aperte [enter] para continuar.", True, "white")
-        texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.1*ALTURA))
-        tela.blit(texto, texto_retangulo)
+    def loop(self):
+        tela.fill("#202020")
 
-    pygame.display.update()
-    pygame.display.flip()
+        dt = clock.tick(120) / 350
+        if (self.em_movimento and not self.pausado):
+            self.t += dt
 
-    clock.tick(120)
+        while(self.menu): 
+            self.mostrar_menu()
+            
+        self.input()
+        self.informacoes()
 
+        if (not self.em_movimento):
+            mostrar_texto(1, "Configure as condições iniciais", 0.5*LARGURA,0.15*ALTURA )
+            
+        self.objeto.atualizar(self, self.alvo)
+
+        self.verificar_jogada()
+        
+        if (self.pausado):
+            mostrar_texto(1, "Pausado", 0.5*LARGURA,0.08*ALTURA)
+
+        if (DEBUG):
+            if (self.acertou):
+                mostrar_texto(2, "Acertou", 0.5*LARGURA,0.5*ALTURA)
+
+            mostrar_texto(2, f"{self.em_movimento} {self.pausado}", 0.5*LARGURA,0.3*ALTURA)
+
+        pygame.display.update()
+        pygame.display.flip()
+
+        clock.tick(120)
+        
+  
+jogo = Jogo()
+
+while(jogo.loop_jogo):
+    jogo.loop()
 
 pygame.quit()
