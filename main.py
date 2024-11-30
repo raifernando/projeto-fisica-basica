@@ -36,6 +36,10 @@ class Objeto:
         self.raio = 20
         self.cor = "purple"
 
+        self.trajetoria = []
+        self.variacao_tempo_trajetoria = 0.05
+        self.tempo_trajetoria = self.variacao_tempo_trajetoria
+
         self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
         
 
@@ -83,6 +87,15 @@ class Objeto:
         # Plataforma
         pygame.draw.line(tela, self.cor, (self.x0-30, self.y0+self.raio), (self.x0+30, self.y0+self.raio), 5)
 
+    def desenhar_trajetoria(self, t):
+        if (t >= self.tempo_trajetoria):
+            self.trajetoria.insert(-1, (self.x, self.y))
+            self.tempo_trajetoria += self.variacao_tempo_trajetoria
+
+        for p in self.trajetoria:
+            r = pygame.Rect(p[0], p[1], 5, 5)
+            pygame.draw.rect(tela, "yellow", r)
+
 
     def atualizar_posicao(self, t):
         # Função teste. Mudar para lançamento oblíquo
@@ -109,11 +122,16 @@ class Objeto:
         #! Por enquanto está pausado quando acerta o alvo, isso precisa mudar depois
         if (jogo.em_movimento and not jogo.pausado):
             self.atualizar_posicao(jogo.t)
+            self.desenhar_trajetoria(jogo.t)
 
         if (not self.naTela() or self.checar_colisao()):
             self.voltar_origem()
+            self.trajetoria = []
+            self.tempo_trajetoria = 0
             jogo.t = 0
             jogo.em_movimento = False
+
+        
 
     #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
@@ -230,7 +248,7 @@ class Jogo:
         self.placar = 0
 
     def mostrar_menu(self):
-        mostrar_texto(1, "AperteSD para iniciar", 0.5*LARGURA, 0.5*ALTURA)
+        mostrar_texto(1, "Aperte para iniciar", 0.5*LARGURA, 0.5*ALTURA)
         pygame.display.update()
 
         for event in pygame.event.get():
