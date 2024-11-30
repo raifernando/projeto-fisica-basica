@@ -29,7 +29,7 @@ class Objeto:
         self.tamanho_seta = 100
 
         self.x0, self.y0 = 200, 550
-        self.vx, self.vy = 0, 0
+        self.velocidade = 0
         self.x, self.y = self.x0, self.y0
         self.arrastar = False
         self.gravidade = 200
@@ -44,7 +44,7 @@ class Objeto:
         
 
     def desenhar_angulo(self):
-        self.tamanho_seta = min(90, max(40, math.pow(self.vx**2 + self.vy**2, 0.34)))
+        self.tamanho_seta = min(90, max(40, math.pow(self.velocidade**2, 0.34)))
         novo_x = self.x0 + self.tamanho_seta*np.cos(self.angulo)
         novo_y = self.y0 + self.tamanho_seta*np.sin(self.angulo)
 
@@ -99,8 +99,11 @@ class Objeto:
 
     def atualizar_posicao(self, t):
         # Função teste. Mudar para lançamento oblíquo
-        self.x = self.x0 + self.vx * t
-        self.y = self.y0 + self.vy * t + 0.5 * self.gravidade * (t ** 2)
+        vx = self.velocidade*math.cos(self.angulo)
+        vy = self.velocidade*math.sin(self.angulo)
+
+        self.x = self.x0 + vx * t
+        self.y = self.y0 + vy * t + 0.5 * self.gravidade * (t ** 2)
 
         self.desenhar()
 
@@ -142,8 +145,7 @@ class Objeto:
         angulo_graus = 0 - math.degrees(self.angulo)
         mostrar_texto(2, f"angulo: {angulo_graus:.2f}°", 0.93*LARGURA,0.45*ALTURA)
 
-        mostrar_texto(2, f"vx: {self.vx:.2f}", 0.94*LARGURA,0.50*ALTURA)
-        mostrar_texto(2, f"vy: {self.vy:.2f}", 0.94*LARGURA,0.55*ALTURA)
+        mostrar_texto(2, f"v: {self.velocidade:.2f}", 0.94*LARGURA,0.65*ALTURA)
 
         mostrar_texto(2, f"x:{int(self.x)} y:{int(self.y)}", 0.94*LARGURA,0.60*ALTURA)
 
@@ -168,9 +170,7 @@ class Objeto:
         dist = math.hypot(dx, dy)
 
         #formula obtida da conservacao de energia: o valor de cima é a constantes elastica, o de baixo a massa
-        velocidade = dist*np.sqrt(3/0.5) 
-        self.vx = velocidade*math.cos(self.angulo)
-        self.vy = velocidade*math.sin(self.angulo)
+        self.velocidade = dist*np.sqrt(3/0.5) 
 
 
 class Alvo:
@@ -269,17 +269,13 @@ class Jogo:
 
                 if not self.em_movimento:
                     if event.key == pygame.K_UP:
-                        self.objeto.vy += 20
+                        self.objeto.velocidade += 20
                     elif event.key == pygame.K_DOWN:
-                        self.objeto.vy -= 20
+                        self.objeto.velocidade -= 20
                     elif event.key == pygame.K_LEFT:
-                        self.objeto.vx -= 20
-                    elif event.key == pygame.K_RIGHT:
-                        self.objeto.vx += 20
-                    elif event.key == pygame.K_a:
-                        self.objeto.angulo = (self.objeto.angulo + np.radians(5))
-                    elif event.key == pygame.K_d:
                         self.objeto.angulo = (self.objeto.angulo - np.radians(5))
+                    elif event.key == pygame.K_RIGHT:
+                        self.objeto.angulo = (self.objeto.angulo + np.radians(5))
                 
                 if event.key == pygame.K_r:
                     self.__init__()
