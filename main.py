@@ -2,7 +2,6 @@ import pygame
 import numpy as np
 import random
 import math
-from sympy import Line
 
 pygame.init()
 
@@ -11,9 +10,6 @@ RESOLUCAO = (1280, 720)
 LARGURA = RESOLUCAO[0]
 ALTURA = RESOLUCAO[1]
 
-INFO_FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/60))
-PEQUENA_FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/30))
-
 def mostrar_texto(tam, texto, x, y):
     tamanhos = [10, 30, 60, 90]
     FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/tamanhos[tam]))
@@ -21,12 +17,9 @@ def mostrar_texto(tam, texto, x, y):
     t = FONTE.render(texto, True, "white")
     t_r = t.get_rect(center=(x,y))
     tela.blit(t, t_r)
-    # pygame.display.update()
-
 
 tela = pygame.display.set_mode(RESOLUCAO)
 clock = pygame.time.Clock()
-# t = 0
 
 pygame.display.set_caption("física-basica")
 
@@ -104,44 +97,23 @@ class Objeto:
             self.atualizar_posicao(jogo.t)
 
         if (not self.naTela()):
-            # resetar_inicio()
             self.voltar_origem()
-            # jogo.tentativas.tentativas += 1
             jogo.t = 0
             jogo.em_movimento = False
 
     #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
-        texto_origem = f"O({self.x0},{self.y0})"
-        origem = INFO_FONTE.render(texto_origem, True, "white")
-        origem_retangulo = origem.get_rect(center=(0.95*LARGURA,0.40*ALTURA))
-        tela.blit(origem, origem_retangulo)
+        mostrar_texto(2, f"t:{tempo:.2f}", 0.94*LARGURA,0.35*ALTURA)
 
+        mostrar_texto(2, f"O({self.x0},{self.y0})", 0.94*LARGURA,0.40*ALTURA)
+        
         angulo_graus = 0 - math.degrees(self.angulo)
-        texto_angulo = "angulo: " + str(angulo_graus) + "°"
-        angulo = INFO_FONTE.render(texto_angulo, True, "white")
-        angulo_retangulo = angulo.get_rect(center=(0.95*LARGURA,0.45*ALTURA))
-        tela.blit(angulo, angulo_retangulo)
+        mostrar_texto(2, f"angulo: {angulo_graus:.2f}°", 0.93*LARGURA,0.45*ALTURA)
 
+        mostrar_texto(2, f"vx: {self.vx:.2f}", 0.94*LARGURA,0.50*ALTURA)
+        mostrar_texto(2, f"vy: {self.vy:.2f}", 0.94*LARGURA,0.55*ALTURA)
 
-        texto_vx = "vx: " + str(self.vx)
-        velocidade_vx = INFO_FONTE.render(texto_vx, True, "white")
-        velocidade_vx_retangulo = velocidade_vx.get_rect(center=(0.95*LARGURA,0.50*ALTURA))
-        tela.blit(velocidade_vx, velocidade_vx_retangulo)
-
-        texto_vy = "vy: " + str(self.vy)
-        velocidade_vy = INFO_FONTE.render(texto_vy, True, "white")
-        velocidade_vy_retangulo = velocidade_vy.get_rect(center=(0.95*LARGURA,0.55*ALTURA))
-        tela.blit(velocidade_vy, velocidade_vy_retangulo)
-
-        texto_pos = f"x:{self.x} y:{self.y}"
-        pos = INFO_FONTE.render(texto_pos, True, "white")
-        pos_retangulo = pos.get_rect(center=(0.95*LARGURA,0.60*ALTURA))
-        tela.blit(pos, pos_retangulo)
-
-        tempo = INFO_FONTE.render(f"t:{tempo}", True, "white")
-        tempo_retangulo = tempo.get_rect(center=(0.95*LARGURA,0.35*ALTURA))
-        tela.blit(tempo, tempo_retangulo)
+        mostrar_texto(2, f"x:{int(self.x)} y:{int(self.y)}", 0.94*LARGURA,0.60*ALTURA)
 
     def naTela(self):
         if (int(self.x) >= 0 and int(self.x) <= LARGURA and int(self.y) >= 0 and int(self.y) <= ALTURA):
@@ -193,9 +165,7 @@ class Alvo:
         dist = np.sqrt((x - self.x0)**2 + (y-self.y0)**2)
         print(dist)
         if (dist < 50):
-            texto = INFO_FONTE.render("Acertou!", True, "white")
-            texto_retangulo = texto.get_rect(center=(0.5*LARGURA,0.9*ALTURA))
-            tela.blit(texto, texto_retangulo)
+            mostrar_texto(2, "Acertou!", 0.5*LARGURA,0.9*ALTURA )
             self.cor = "cyan"
 
             return True
@@ -203,22 +173,6 @@ class Alvo:
         self.cor = "green"
         return False
     
-# objeto = Objeto()
-# alvo = Alvo()
-
-#-- Lógica do loop do jogo (estados)
-# loop = True
-# pausado = False # Não contabiliza o tempo
-# em_movimento = False # Falso quando está configurando as condições iniciais
-
-# acertou = False # True se o objeto acertou o alvo
-
-# Mudar essa lógica
-# def resetar_inicio():
-#     objeto.resetar()
-#     global t
-#     t = 0
-
 class Tentativas:
     def __init__(self):
         self.tentativas = 0
@@ -232,8 +186,6 @@ class Tentativas:
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
 
     
-# tentativas = Tentativas()        
-
 DEBUG = False
 
 class Jogo:
