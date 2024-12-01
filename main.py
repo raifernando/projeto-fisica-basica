@@ -172,7 +172,7 @@ class Objeto:
 class Alvo:
     def __init__(self):
         self.x0, self.y0 = -500, -500
-        self.largura = 10
+        self.largura = 50
         self.cor = "cyan"
         self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
     
