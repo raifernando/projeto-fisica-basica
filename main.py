@@ -11,11 +11,15 @@ LARGURA = RESOLUCAO[0]
 ALTURA = RESOLUCAO[1]
 tela = pygame.display.set_mode(RESOLUCAO)
 clock = pygame.time.Clock()
-pygame.display.set_caption("física-basica")
+pygame.display.set_caption("Projeto Final Física Básica")
 
-def mostrar_texto(tam, texto, x, y):
-    tamanhos = [10, 30, 60, 90]
-    FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", int(LARGURA/tamanhos[tam]))
+def mostrar_texto(tam, texto, x, y, customizado=0):
+    tamanhos = [10, 30, 60, 75]
+    tamanho_fonte = int(LARGURA/tamanhos[tam])
+    if customizado:
+        tamanho_fonte = int(LARGURA/customizado)
+
+    FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", tamanho_fonte)
 
     t = FONTE.render(texto, True, "white")
     t_r = t.get_rect(center=(x,y))
@@ -114,17 +118,14 @@ class Objeto:
 
     #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
-        mostrar_texto(2, f"t:{tempo:.2f}", 0.94*LARGURA,0.35*ALTURA)
-
-        mostrar_texto(2, f"O({self.x0},{self.y0})", 0.94*LARGURA,0.40*ALTURA)
+        angulo_graus = (0 - math.degrees(self.angulo)) % 360
         
-        angulo_graus = 0 - math.degrees(self.angulo)
-        mostrar_texto(2, f"angulo: {angulo_graus:.2f}°", 0.93*LARGURA,0.45*ALTURA)
-
         velocidade_convertida = self.velocidade*0.026458 #conversão de pixels por segundo para cm/s
-        mostrar_texto(2, f"v: {velocidade_convertida:.2f}", 0.94*LARGURA,0.65*ALTURA)
+        
+        angulo = f"ângulo: {angulo_graus:.2f}°"
+        velocidade = f"velocidadade: {velocidade_convertida:.2f}"
 
-        mostrar_texto(2, f"x:{int(self.x)} y:{int(self.y)}", 0.94*LARGURA,0.60*ALTURA)
+        mostrar_texto(3, angulo + " | " + velocidade, 0.5*LARGURA,0.95*ALTURA)
 
     def naTela(self):
         if (int(self.x) >= 0 and int(self.x) <= LARGURA and int(self.y) >= 0 and int(self.y) <= ALTURA):
@@ -154,7 +155,7 @@ class Objeto:
 class Alvo:
     def __init__(self):
         self.x0, self.y0 = -500, -500
-        self.cor = "green"
+        self.cor = "cyan"
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
     
     def resetar(self):
@@ -193,12 +194,8 @@ class Alvo:
         # Calcular a distância entre o círculo e o ponto mais próximo
         distancia = math.sqrt((x - p_x)** 2 + (y - p_y)** 2)
 
-        if distancia <= raio:
-            self.cor = "cyan"
-            return True 
+        return distancia <= raio
         
-        self.cor = "green"
-        return False
     
 class Tentativas:
     def __init__(self):
@@ -211,6 +208,9 @@ class Tentativas:
         for i in range(0, 3):
             preencher = 0 if i < self.tentativas else self.borda
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
+    
+        mostrar_texto(2, "|  Fase 1", self.origem[0]*5 + 10, self.origem[1])
+
 
     
 DEBUG = False
@@ -288,7 +288,7 @@ class Jogo:
         self.tentativas.mostrar()
 
         if self.acertou:
-            mostrar_texto(2, "Acertou!", 0.5*LARGURA,0.9*ALTURA )
+            mostrar_texto(2, "Acertou!", 0.5*LARGURA,0.9*ALTURA)
 
         mostrar_texto(1, f"{self.placar}", 60, 80)
 
@@ -304,7 +304,7 @@ class Jogo:
         if not self.estado_atual["menu"]:
             self.proximo_estado = self.resetar
         
-        mostrar_texto(1, "Aperte para iniciar", 0.5*LARGURA, 0.5*ALTURA)
+        mostrar_texto(1, "Pressione para iniciar", 0.5*LARGURA, 0.5*ALTURA)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -325,7 +325,6 @@ class Jogo:
 
     def configurar(self):
         self.informacoes()
-        mostrar_texto(1, "Configure as condições iniciais", 0.5*LARGURA,0.15*ALTURA)
         self.objeto.desenhar_angulo()
 
         self.resetar_tentativa()
@@ -341,17 +340,16 @@ class Jogo:
         self.t += dt
 
         if self.alvo.checar_proximidade(self.objeto.x, self.objeto.y, self.objeto.raio):
-            self.acertou = True
+            self.estado_atual["jogar"] = False
+            self.estado_atual["vitoria"] = True
+            self.proximo_estado = self.vitoria
 
         self.objeto.desenhar_trajetoria(self.t)
         self.objeto.atualizar_posicao(self.t)
 
         if not self.objeto.naTela() or self.objeto.checar_colisao():
             self.estado_atual["jogar"] = False
-            if self.acertou:
-                self.estado_atual["vitoria"] = True
-                self.proximo_estado = self.vitoria
-            elif self.tentativas.tentativas >= 3:
+            if self.tentativas.tentativas >= 3:
                 self.estado_atual["derrota"] = True
                 self.proximo_estado = self.derrota
             else:
@@ -364,9 +362,20 @@ class Jogo:
         self.proximo_estado = self.resetar
 
     def derrota(self):
-        self.placar = 0
-        self.estado_atual["derrota"] = False
-        self.proximo_estado = self.resetar
+        mostrar_texto(2, f"Pressione para continuar", 0.5*LARGURA, 0.10*ALTURA)
+        mostrar_texto(1, "Fim de jogo!", 0.5*LARGURA, 0.5*ALTURA, customizado=15)
+        mostrar_texto(2, f"Pontuação: {self.placar}", 0.5*LARGURA, 0.60*ALTURA, customizado=30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.loop_jogo = False
+            if event.type == pygame.KEYDOWN:
+                self.estado_atual["derrota"] = False
+        
+        if not self.estado_atual["derrota"]:
+            self.placar = 0
+            self.objeto.x0 = self.objeto.y0 = self.alvo.x0 = self.alvo.y0 = -550
+            self.proximo_estado = self.resetar
 
     def executar_proximo_estado(self):
         self.proximo_estado()
@@ -377,7 +386,7 @@ class Jogo:
         
         self.proximo_estado()
 
-        if (not self.estado_atual["menu"] and not self.estado_atual["configurar"]):
+        if (not self.estado_atual["menu"] and not self.estado_atual["configurar"] and not self.estado_atual["derrota"]):
             self.informacoes()
 
         for event in pygame.event.get():
