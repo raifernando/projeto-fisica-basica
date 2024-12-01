@@ -28,7 +28,7 @@ def mostrar_texto(tam, texto, x, y, customizado=0):
 
 class Objeto:
     def __init__(self):
-        self.angulo = 0.0 # radiano
+        self.angulo = 0.0 # em radiano
         self.tamanho_seta = 100
 
         self.x0, self.y0 = -300, -300
@@ -63,8 +63,6 @@ class Objeto:
         direita_y = novo_y - tamanho_abas*np.sin(self.angulo - angulo_abas)
 
         pygame.draw.line(tela, self.cor, (novo_x, novo_y), (direita_x, direita_y), 5)
-
-    
 
     def aleatorizar_posicao(self, nivel):
         posicao_x = posicao_y = 0
@@ -113,7 +111,6 @@ class Objeto:
 
 
     def atualizar_posicao(self, t):
-        # Função teste. Mudar para lançamento oblíquo
         vx = self.velocidade*math.cos(self.angulo)
         vy = self.velocidade*math.sin(self.angulo)
 
@@ -126,14 +123,11 @@ class Objeto:
         esquerda, direita = self.x0-30, self.x0+30
         altura = self.y0+self.raio
 
-        # print(esquerda, direita, altura, self.x, self.y)
-
         if (esquerda <= self.x <= direita and altura - 5 <= self.y <= altura + 5):
             return True
         return False
   
 
-    #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
         angulo_graus = (0 - math.degrees(self.angulo)) % 360
         
@@ -148,7 +142,6 @@ class Objeto:
         if (int(self.x) >= 0 and int(self.x) <= LARGURA and int(self.y) >= 0 and int(self.y) <= ALTURA):
             return True
         return False
-
 
     def arrastar_inicio(self):
        self.arrastar = True
@@ -167,7 +160,6 @@ class Objeto:
         #formula obtida da conservacao de energia: o valor de cima é a constantes elastica, o de baixo a massa
         self.velocidade = min(dist*np.sqrt(3/0.5), 600) 
         
-
 
 class Alvo:
     def __init__(self):
@@ -322,9 +314,9 @@ class Jogo:
         keys = pygame.key.get_pressed()
         
         if keys[pygame.K_UP]:
-            self.objeto.velocidade = min(600, max(0, self.objeto.velocidade+3))
+            self.objeto.velocidade = min(800, max(0, self.objeto.velocidade+3))
         if keys[pygame.K_DOWN]:
-            self.objeto.velocidade = min(600, max(0, self.objeto.velocidade-3))
+            self.objeto.velocidade = min(800, max(0, self.objeto.velocidade-3))
         if keys[pygame.K_LEFT]:
             self.objeto.angulo -= np.radians(1)
         if keys[pygame.K_RIGHT]:
@@ -369,6 +361,8 @@ class Jogo:
                 self.estado_atual["menu"] = False
 
     def resetar(self):
+        self.nivel = math.ceil((self.placar + 1) / 3)
+
         self.objeto.aleatorizar_posicao(self.nivel)
         self.alvo.aleatorizar_posicao(self.objeto, self.nivel)
 
@@ -413,7 +407,6 @@ class Jogo:
 
     def vitoria(self):
         self.placar += 1
-        self.nivel = math.ceil((self.placar + 1) / 3)
         self.estado_atual["vitoria"] = False
         self.proximo_estado = self.resetar
 
