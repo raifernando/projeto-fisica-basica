@@ -121,7 +121,8 @@ class Objeto:
         angulo_graus = 0 - math.degrees(self.angulo)
         mostrar_texto(2, f"angulo: {angulo_graus:.2f}°", 0.93*LARGURA,0.45*ALTURA)
 
-        mostrar_texto(2, f"v: {self.velocidade:.2f}", 0.94*LARGURA,0.65*ALTURA)
+        velocidade_convertida = self.velocidade*0.026458 #conversão de pixels por segundo para cm/s
+        mostrar_texto(2, f"v: {velocidade_convertida:.2f}", 0.94*LARGURA,0.65*ALTURA)
 
         mostrar_texto(2, f"x:{int(self.x)} y:{int(self.y)}", 0.94*LARGURA,0.60*ALTURA)
 
