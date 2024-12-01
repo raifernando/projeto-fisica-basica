@@ -22,7 +22,7 @@ $$ \begin{align}
   v_{y}(t) &= -gt + b \\
  \end{align} $$
 
- onde v_{x} e v_{y} são as componentes do vetor velocidade ($\vec{v}$), a e b são constantes arbitrárias. Para se determinar essas constantes, são utilizadas as condições iniciais $v_{x}(0) = |\vec{v_{0}}|\cos\theta = v_{0}cos\theta$ e $v_{y} = v_{0}\sin\theta$, em que \theta é o ângulo entre $\vec{v_{0}}$ e o eixo $x$. Assim:
+ onde $v_{x}$ e $v_{y}$ são as componentes do vetor velocidade ($\vec{v}$), a e b são constantes arbitrárias. Para se determinar essas constantes, são utilizadas as condições iniciais $v_{x}(0) = |\vec{v_{0}}|\cos\theta = v_{0}cos\theta$ e $v_{y} = v_{0}\sin\theta$, em que $\theta$ é o ângulo entre $\vec{v_{0}}$ e o eixo $x$. Assim:
 
 $$ \begin{align}
  v_{x}(t) &= v_{0}\cos\theta \\
@@ -45,7 +45,76 @@ $$ \begin{align}
   \end{align}
   $}
   $$
+
+  ## Modelagem matemática da escolha da velocidade e do ângulo iniciais
  
+ As equações obtidas para a trajetória do objeto lançado dependem do módulo do vetor velocidade inicial e do ângulo que esse vetor faz com o eixo $x$. É necessário, por conseguinte, que o usuário escolha esses valores. Para tal, foi desenvolvido um sistema que se assemelha a um estilingue: o usuário clica no objeto e, à medida que arrasta o *mouse*, controla o módulo do vetor e o ângulo que ele faz com o eixo das abcissas.
+
+ Dessa forma, é evidente a similaridade desse efeito com o de uma força restauradora: o usuário realiza uma "força" no objeto em um sentido, e esse objeto é lançado no sentido oposto. Assim, pode-se modelar a situação como se houvesse um estilingue que realiza uma força elástica $\vec{F_{e}}$, proporcional à deformação do estilingue, no sentido oposto ao indicado pelo usuário. Como a força elástica é conservativa, a energia mecânica do sistema é conservada. Portanto, sendo $T$ e $U$, respectivamente, as energias cinéticas e potenciais do sistema:
+
+ $$ \begin{align}
+\Delta T = -\Delta U = - (\Delta U_{g} + \Delta U_{e})
+ \end{align} $$
+
+ onde $U_{g}$ e $U_{e}$ são, respectivamente, as energias potenciais gravitacional e elástica do sistema. Aqui será feita uma aproximação: supõe-se que a variação $\Delta y$ da altura do objeto seja suficientemente pequena para que $\Delta U_{g} << \Delta U_{e}$. Logo, se supormos que o objeto está em repouso no início da deformação, que a deformação inicial é nula, considerando o tempo $t_{f}$ de fim da deformação e início do lançamento do projétil, e $\Delta x$ a deformação final:
+
+$$ \begin{align}
+T(t_{f}) - T(0) &\approx - (U_{e}(t_{f}) - U_{e}(0)) \\
+T(t_{f}) &\approx - U_{e}(t_{f}) \\
+\displaystyle\frac{m(v(t_{f}))^{2}}{2} &\approx \displaystyle\frac{k(\Delta x)^{2}}{2} \\
+v(t_{f}) &\approx \Delta x\sqrt{\displaystyle\frac{k}{m}}
+ \end{align} $$
+
+ onde $k$ é a constante elástica do estilingue. Encontramos então uma expressão para o módulo da velocidade inicial definida pelo usuário:
+ 
+$$ \begin{equation}
+v_{0} = v(t_{f}) \approx \Delta x\sqrt{\displaystyle\frac{k}{m}}  
+\end{equation}$$
+
+Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos interessa e, uma vez que a massa do objeto é constante e inacessível ao usuário, $m$ também não interessa. Portanto, o módulo da velocidade inicial é diretamente proporcional à deformação (noo jogo, à distância entre o *mouse* e o objeto) e assim:
+
+ $$ \fbox{$
+ \begin{equation} 
+ v_{0} \approx b\Delta x 
+  \end{equation}
+  $}
+  $$
+
+  para alguma constante $b > 0$. O ângulo inicial é determinado diretamente no código em Python.
+
+  ## Implementação
+
+  - **Linguagens e pacotes:**
+  - Implementado em Python, o projeto se utiliza dos pacotes math, NumPy, Pygame e Random. Esses pacotes oferecem recursos matemáticos para as implementações das equações obtidas pelo modelo matemático e para a geração de números aleatórios, além de todo o aporte necessário para o desenvolvimento gráfico do jogo.
+
+
+## Como usar
+
+- **Instalação e Dependências:**
+- É necessário que alguma versão da linguagem Python3 esteja instalada.
+- Instale os pacotes mencionados na seção anterior.
+- Faça o download dos assets necessários, presentes na seção *assets/font* do projeto no GitHub.
+
+- **Exemplos de Uso:**  
+  - Para rodar a simulação básica, utilize o código:
+    ```python
+      python3 main.py
+    ```
+
+Este projeto foi desenvolvido por:
+  
+      Lucas Dúckur Nunes Andreolli: lucas.andreolli@usp.br
+      --
+      --
+      --
+    
+  Para ser entregue como o projeto final que faz parte  do processo avaliativo da disciplina 7600105 - Física Básica I (2024) da USP-São Carlos ministrada pelos professores Krissia de Zawadzki e Esmerindo de Sousa Bernardes.
+
+ ## Referências: 
+ (1) Bernardes, E. de S. (2024). Dinâmica-v2 (Notas de aula). 7600105 - Física Básica I. Universidade de São Paulo, São Carlos.
+  
+
+
  
 
 
