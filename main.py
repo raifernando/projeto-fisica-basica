@@ -66,11 +66,28 @@ class Objeto:
 
     
 
-    def aleatorizar_posicao(self):
-        self.x0 = random.randint(0.2*LARGURA, 0.8*LARGURA)
-        self.y0 = random.randint(int(0.3*ALTURA), int(0.7*ALTURA))
-
-        self.x, self.y = self.x0, self.y0
+    def aleatorizar_posicao(self, nivel):
+        posicao_x = posicao_y = 0
+        nivel = (nivel % 5) + 1 
+        
+        match nivel:
+            case 0 | 1 | 2:
+                posicao_x = random.uniform(0.4, 0.6)*LARGURA 
+                posicao_y = random.uniform(0.6, 0.5)*ALTURA
+            case 3:
+                posicao_x = random.uniform(0.4, 0.6)*LARGURA 
+                posicao_y = random.uniform(0.7, 0.55)*ALTURA
+            case 4:
+                posicao_x = random.choice([random.uniform(0.2, 0.3), random.uniform(0.7, 0.8)])*LARGURA
+                posicao_y = random.uniform(0.6, 0.7)*ALTURA
+            case 5:
+                posicao_x = 0.5*LARGURA
+                posicao_y = 0.4*ALTURA
+            case _:
+                posicao_x = random.randint(0.1*LARGURA, 0.9*LARGURA)
+                posicao_y = random.randint(0.1*ALTURA, 0.9*ALTURA)
+        
+        self.x0, self.y0 = posicao_x, posicao_y
 
 
     def resetar(self):
@@ -155,29 +172,67 @@ class Objeto:
 class Alvo:
     def __init__(self):
         self.x0, self.y0 = -500, -500
+        self.largura = 10
         self.cor = "cyan"
-        self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
+        self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
     
     def resetar(self):
         self.x0, self.y0 = 500, 500
-        self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
+        self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
 
     def desenhar(self):
         pygame.draw.rect(tela, self.cor, self.rect)
 
-    def aleatorizar_posicao(self, objeto:Objeto):
-        posicao = random.randint(1, 2)
-        if (posicao == 1): #cima
-            self.x0 = random.randint(0.1*LARGURA, 0.9*LARGURA)
-            self.y0 = random.randint(0.1*ALTURA, int(objeto.y0*0.95))
-        else:
-            esquerda = random.randint(0.1*LARGURA, max(0.1*LARGURA, int(objeto.x0) - 100))
-            direita = random.randint(max(0.9*LARGURA, int(objeto.x0) + 100), 0.9*LARGURA)
-
-            self.x0 = random.choice([esquerda, direita])
-            self.y0 = random.randint(int(objeto.y0*1.05), 0.9*ALTURA)
+    def aleatorizar_posicao(self, objeto:Objeto, nivel):
+        posicao_x = posicao_y = 0
         
-        self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
+        if (nivel % 5 == 0):
+            self.largura = max(self.largura - 3, 10)
+            self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
+
+        nivel = (nivel % 5) + 1 
+
+        match nivel:
+            case 1:
+                posicao_x = random.choice([random.uniform(0.25, 0.35), random.uniform(0.65, 0.75)])*LARGURA 
+                posicao_y = 0.5*ALTURA
+            case 2:
+                x_esq = random.randint(int(0.3*LARGURA), int(max(objeto.x - 0.3*LARGURA, 0.3*LARGURA)))
+                x_dir = random.randint(int(min(objeto.x + 0.3*LARGURA, 0.8*LARGURA)), int(0.8*LARGURA))
+
+                posicao_x = random.choice([x_dir, x_esq])
+                posicao_y = random.choice([0.3, 0.5])*ALTURA 
+            case 3:
+                x_esq = random.randint(int(0.1*LARGURA), int(max(objeto.x - 0.1*LARGURA, 0.1*LARGURA)))
+                x_dir = random.randint(int(min(objeto.x + 0.1*LARGURA, 0.9*LARGURA)), int(0.9*LARGURA))
+
+                posicao_x = random.choice([x_dir, x_esq])
+                posicao_y = random.choice([0.25, 0.5])*ALTURA 
+            
+            case 4:
+                x_esq = random.randint(int(0.1*LARGURA), int(max(objeto.x - 0.1*LARGURA, 0.1*LARGURA)))
+                x_dir = random.randint(int(min(objeto.x + 0.1*LARGURA, 0.9*LARGURA)), int(0.9*LARGURA))
+
+                posicao_x = random.choice([x_dir, x_esq])
+                posicao_y = random.choice([0.25, 0.6])*ALTURA
+
+            case 5:
+                x_esq = random.randint(int(0.2*LARGURA), int(0.3*LARGURA))
+                x_dir = random.randint(int(0.7*LARGURA), int(0.9*LARGURA))
+
+                y_cima = random.randint(int(0.2*ALTURA), int(0.3*ALTURA))
+                y_baixo = random.randint(int(0.5*ALTURA), int(0.9*ALTURA))
+
+
+                posicao_x = random.choice([x_dir, x_esq])
+                posicao_y = random.choice([y_cima, y_baixo])
+
+            case _:
+                posicao_x = random.randint(0.1*LARGURA, 0.9*LARGURA)
+                posicao_y = random.randint(0.1*ALTURA, 0.9*ALTURA)
+        
+        self.x0, self.y0 = posicao_x, posicao_y
+        self.rect.center = [posicao_x, posicao_y]
 
     # Checa se o alvo intersecta o objeto
     def checar_proximidade(self, x, y, raio):
@@ -208,8 +263,6 @@ class Tentativas:
         for i in range(0, 3):
             preencher = 0 if i < self.tentativas else self.borda
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
-    
-        mostrar_texto(2, "|  Fase 1", self.origem[0]*5 + 10, self.origem[1])
 
 
     
@@ -239,6 +292,7 @@ class Jogo:
         self.tentativas = Tentativas()
 
         self.placar = 0
+        self.nivel = 1
 
     #--- Funções auxiliares
     def input(self):
@@ -291,6 +345,7 @@ class Jogo:
             mostrar_texto(2, "Acertou!", 0.5*LARGURA,0.9*ALTURA)
 
         mostrar_texto(1, f"{self.placar}", 60, 80)
+        mostrar_texto(2, f"|  Nível {self.nivel}", self.tentativas.origem[0]*5 + 10, self.tentativas.origem[1])
 
     def resetar_tentativa(self):
         self.t = 0
@@ -314,8 +369,8 @@ class Jogo:
                 self.estado_atual["menu"] = False
 
     def resetar(self):
-        self.objeto.aleatorizar_posicao()
-        self.alvo.aleatorizar_posicao(self.objeto)
+        self.objeto.aleatorizar_posicao(self.nivel)
+        self.alvo.aleatorizar_posicao(self.objeto, self.nivel)
 
         self.tentativas.tentativas = 0
 
@@ -358,6 +413,7 @@ class Jogo:
 
     def vitoria(self):
         self.placar += 1
+        self.nivel = math.ceil((self.placar + 1) / 3)
         self.estado_atual["vitoria"] = False
         self.proximo_estado = self.resetar
 
