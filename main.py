@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 import random
 import math
+import os
 
 pygame.init()
 
@@ -13,7 +14,7 @@ tela = pygame.display.set_mode(RESOLUCAO)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Projeto Final Física Básica")
 
-def mostrar_texto(tam, texto, x, y, customizado=0):
+def mostrar_texto(tam, texto, x, y, customizado=0, cor="white"):
     tamanhos = [10, 30, 60, 75]
     tamanho_fonte = int(LARGURA/tamanhos[tam])
     if customizado:
@@ -21,7 +22,7 @@ def mostrar_texto(tam, texto, x, y, customizado=0):
 
     FONTE = pygame.font.Font("assets/font/GetVoIP-Grotesque.ttf", tamanho_fonte)
 
-    t = FONTE.render(texto, True, "white")
+    t = FONTE.render(texto, True, cor)
     t_r = t.get_rect(center=(x,y))
     tela.blit(t, t_r)
 
@@ -134,7 +135,7 @@ class Objeto:
         velocidade_convertida = self.velocidade*0.026458 #conversão de pixels por segundo para cm/s
         
         angulo = f"ângulo: {angulo_graus:.2f}°"
-        velocidade = f"velocidadade: {velocidade_convertida:.2f}"
+        velocidade = f"velocidadade: {velocidade_convertida:.2f} cm/s"
 
         mostrar_texto(3, angulo + " | " + velocidade, 0.5*LARGURA,0.95*ALTURA)
 
@@ -158,7 +159,7 @@ class Objeto:
         dist = math.hypot(dx, dy)
 
         #formula obtida da conservacao de energia: o valor de cima é a constantes elastica, o de baixo a massa
-        self.velocidade = min(dist*np.sqrt(3/0.5), 600) 
+        self.velocidade = min(dist*np.sqrt(3/0.5), 800) 
         
 
 class Alvo:
@@ -284,9 +285,28 @@ class Jogo:
         self.tentativas = Tentativas()
 
         self.placar = 0
+        self.recorde = 0
+        self.novo_recorde = False
         self.nivel = 1
 
     #--- Funções auxiliares
+    def salvar_recorde(self):
+        if not os.path.exists("dados/"):
+            os.makedirs("dados/")
+
+        try:
+            with open("dados/recorde.bin", "wb+") as arquivo:
+                arquivo.write(self.recorde.to_bytes(4, byteorder='big'))
+        except (FileNotFoundError, ValueError):
+            return 0
+
+    def ler_recorde(self):
+        try:
+            with open("dados/recorde.bin", "rb") as arquivo:
+                return int.from_bytes(arquivo.read(4), byteorder='big')
+        except (FileNotFoundError, ValueError):
+            return 0
+    
     def input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -411,9 +431,19 @@ class Jogo:
         self.proximo_estado = self.resetar
 
     def derrota(self):
+        if (self.placar > self.recorde):
+            self.recorde = self.placar
+            self.salvar_recorde()
+            self.novo_recorde = True
+
         mostrar_texto(2, f"Pressione para continuar", 0.5*LARGURA, 0.10*ALTURA)
         mostrar_texto(1, "Fim de jogo!", 0.5*LARGURA, 0.5*ALTURA, customizado=15)
         mostrar_texto(2, f"Pontuação: {self.placar}", 0.5*LARGURA, 0.60*ALTURA, customizado=30)
+        if self.novo_recorde:
+            mostrar_texto(3, f"Novo recorde!", 0.5*LARGURA, 0.65*ALTURA, cor="cyan")
+        else:
+            mostrar_texto(3, f"Recorde: {self.recorde}", 0.5*LARGURA, 0.65*ALTURA)
+            
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -423,6 +453,7 @@ class Jogo:
         
         if not self.estado_atual["derrota"]:
             self.placar = 0
+            self.novo_recorde = False
             self.objeto.x0 = self.objeto.y0 = self.alvo.x0 = self.alvo.y0 = -550
             self.proximo_estado = self.resetar
 
@@ -452,8 +483,13 @@ class Jogo:
   
 
 jogo = Jogo()
+jogo.recorde = jogo.ler_recorde()
 
 while(jogo.loop_jogo):
     jogo.loop()
+
+if (jogo.placar > jogo.recorde):
+    jogo.recorde = jogo.placar
+    jogo.salvar_recorde()
 
 pygame.quit()
