@@ -9,6 +9,9 @@ RESOLUCAO = (1280, 720)
 
 LARGURA = RESOLUCAO[0]
 ALTURA = RESOLUCAO[1]
+tela = pygame.display.set_mode(RESOLUCAO)
+clock = pygame.time.Clock()
+pygame.display.set_caption("física-basica")
 
 def mostrar_texto(tam, texto, x, y):
     tamanhos = [10, 30, 60, 90]
@@ -18,17 +21,13 @@ def mostrar_texto(tam, texto, x, y):
     t_r = t.get_rect(center=(x,y))
     tela.blit(t, t_r)
 
-tela = pygame.display.set_mode(RESOLUCAO)
-clock = pygame.time.Clock()
-
-pygame.display.set_caption("física-basica")
 
 class Objeto:
     def __init__(self):
         self.angulo = 0.0 # radiano
         self.tamanho_seta = 100
 
-        self.x0, self.y0 = 200, 550
+        self.x0, self.y0 = -300, -300
         self.velocidade = 0
         self.x, self.y = self.x0, self.y0
         self.arrastar = False
@@ -39,9 +38,6 @@ class Objeto:
         self.trajetoria = []
         self.variacao_tempo_trajetoria = 0.05
         self.tempo_trajetoria = self.variacao_tempo_trajetoria
-
-        self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
-        
 
     def desenhar_angulo(self):
         self.tamanho_seta = min(90, max(40, math.pow(self.velocidade**2, 0.34)))
@@ -71,8 +67,6 @@ class Objeto:
         self.y0 = random.randint(int(0.3*ALTURA), int(0.7*ALTURA))
 
         self.x, self.y = self.x0, self.y0
-
-        self.circulo = pygame.draw.circle(tela, self.cor, (self.x0, self.y0), self.raio)
 
 
     def resetar(self):
@@ -111,30 +105,12 @@ class Objeto:
         esquerda, direita = self.x0-30, self.x0+30
         altura = self.y0+self.raio
 
-        print(esquerda, direita, altura, self.x, self.y)
+        # print(esquerda, direita, altura, self.x, self.y)
 
         if (esquerda <= self.x <= direita and altura - 5 <= self.y <= altura + 5):
             return True
         return False
-
-    def atualizar(self, jogo, alvo):
-        if(alvo.checar_proximidade(self.x, self.y) and not jogo.acertou):
-            jogo.acertou = True
-            jogo.placar += 1
-        
-        #! Por enquanto está pausado quando acerta o alvo, isso precisa mudar depois
-        if (jogo.em_movimento and not jogo.pausado):
-            self.atualizar_posicao(jogo.t)
-            self.desenhar_trajetoria(jogo.t)
-
-        if (not self.naTela() or self.checar_colisao()):
-            self.voltar_origem()
-            self.trajetoria = []
-            self.tempo_trajetoria = 0
-            jogo.t = 0
-            jogo.em_movimento = False
-
-        
+  
 
     #! Textos temporários, pra mostrar as velocidades. 
     def mostrar_informacoes(self, tempo):
@@ -176,7 +152,7 @@ class Objeto:
 
 class Alvo:
     def __init__(self):
-        self.x0, self.y0 = 500, 500
+        self.x0, self.y0 = -500, -500
         self.cor = "green"
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
     
@@ -204,11 +180,9 @@ class Alvo:
     # Checa se o ponto (x, y) está a uma distância do alvo
     def checar_proximidade(self, x, y):
         dist = np.sqrt((x - self.x0)**2 + (y-self.y0)**2)
-        print(dist)
+        # print(dist)
         if (dist < 50):
-            mostrar_texto(2, "Acertou!", 0.5*LARGURA,0.9*ALTURA )
             self.cor = "cyan"
-
             return True
         
         self.cor = "green"
@@ -231,35 +205,30 @@ DEBUG = False
 
 class Jogo:
     def __init__(self):
-        #-- Lógica do loop do jogo (estados)
+        # Lógica do loop do jogo (estados)
         self.loop_jogo = True
-        self.menu = True # Menu inicial
-        self.pausado = False # Não contabiliza o tempo
-        self.em_movimento = False # Falso quando está configurando as condições iniciais
-    
+        
+        self.estado_atual = {
+            "menu": True,
+            "configurar": False,
+            "jogar": False,
+            "vitoria": False,
+            "derrota": False,
+        }
+
+        self.proximo_estado = self.mostrar_menu
+
         self.acertou = False # True se o objeto acertou o alvo
         self.mouse_apertado = False
 
         self.t = 0
         self.objeto = Objeto()
         self.alvo = Alvo()
-        self.alvo.aleatorizar_posicao(self.objeto)
         self.tentativas = Tentativas()
 
         self.placar = 0
 
-    def mostrar_menu(self):
-        mostrar_texto(1, "Aperte para iniciar", 0.5*LARGURA, 0.5*ALTURA)
-        pygame.display.update()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.loop_jogo = False
-                self.menu = False
-                return False
-            if event.type == pygame.KEYDOWN:
-                self.menu = False
-
+    #--- Funções auxiliares
     def input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -267,111 +236,151 @@ class Jogo:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     self.loop_jogo = False
-
-                
-                if event.key == pygame.K_r:
+                elif event.key == pygame.K_r:
                     self.__init__()
-
-                elif event.key == pygame.K_BACKSPACE:
-                    # Volta objeto para origem
-                    self.objeto.voltar_origem()
-                    self.tentativas.tentativas = 0
-                    self.t = 0
-                    self.acertou = False
-                    self.em_movimento = False
-
-                elif event.key == pygame.K_p:
-                    self.pausado = not self.pausado
-
                 elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
                     if (self.t == 0):
-                        self.em_movimento = True
-                        self.tentativas.tentativas += 1
+                        return True
 
-            if event.type == pygame.MOUSEBUTTONDOWN and not self.em_movimento:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 self.objeto.arrastar_inicio()
                 self.objeto.arrastar_fim(False)
                 self.mouse_apertado = True
 
-            if event.type == pygame.MOUSEBUTTONUP and not self.em_movimento:
+            if event.type == pygame.MOUSEBUTTONUP:
                 if(self.t == 0):
                     self.objeto.arrastar_fim(True)
-                    self.em_movimento = True
-                    self.tentativas.tentativas += 1
                 self.mouse_apertado = False
+                return True
 
         keys = pygame.key.get_pressed()
-        if not self.em_movimento:
-            if keys[pygame.K_UP]:
-                self.objeto.velocidade = min(600, max(0, self.objeto.velocidade+3))
-            if keys[pygame.K_DOWN]:
-                self.objeto.velocidade = min(600, max(0, self.objeto.velocidade-3))
-            if keys[pygame.K_LEFT]:
-                self.objeto.angulo -= np.radians(1)
-            if keys[pygame.K_RIGHT]:
-                self.objeto.angulo += np.radians(1)
+        
+        if keys[pygame.K_UP]:
+            self.objeto.velocidade = min(600, max(0, self.objeto.velocidade+3))
+        if keys[pygame.K_DOWN]:
+            self.objeto.velocidade = min(600, max(0, self.objeto.velocidade-3))
+        if keys[pygame.K_LEFT]:
+            self.objeto.angulo -= np.radians(1)
+        if keys[pygame.K_RIGHT]:
+            self.objeto.angulo += np.radians(1)
 
         if self.mouse_apertado and not self.objeto.arrastar:
             self.objeto.arrastar_fim(False)
+    
+        return False
 
     def informacoes(self):
-        self.objeto.desenhar()
         self.alvo.desenhar()
+        self.objeto.desenhar()
         self.objeto.mostrar_informacoes(self.t)
         self.tentativas.mostrar()
 
-        if (not self.em_movimento):
-            self.objeto.desenhar_angulo()
+        if self.acertou:
+            mostrar_texto(2, "Acertou!", 0.5*LARGURA,0.9*ALTURA )
 
         mostrar_texto(1, f"{self.placar}", 60, 80)
 
+    def resetar_tentativa(self):
+        self.t = 0
+        self.objeto.trajetoria = []
+        self.objeto.tempo_trajetoria = 0
+        self.acertou = False
+        self.objeto.voltar_origem()
 
-    def verificar_jogada(self):
-        if (self.em_movimento):
-            return
+    #--- Estados do jogo
+    def mostrar_menu(self):
+        if not self.estado_atual["menu"]:
+            self.proximo_estado = self.resetar
         
-        if (self.tentativas.tentativas >= 3 or self.acertou):
-            self.alvo.aleatorizar_posicao(self.objeto)
-            self.objeto.aleatorizar_posicao()
-            self.acertou = False
-            self.tentativas.tentativas = 0
+        mostrar_texto(1, "Aperte para iniciar", 0.5*LARGURA, 0.5*ALTURA)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.loop_jogo = False
+                self.estado_atual["menu"] = False
+            if event.type == pygame.KEYDOWN:
+                self.estado_atual["menu"] = False
+
+    def resetar(self):
+        self.objeto.aleatorizar_posicao()
+        self.alvo.aleatorizar_posicao(self.objeto)
+
+        self.tentativas.tentativas = 0
+
+        self.estado_atual["configurar"] = True
+        self.proximo_estado = self.configurar
 
 
+    def configurar(self):
+        self.informacoes()
+        mostrar_texto(1, "Configure as condições iniciais", 0.5*LARGURA,0.15*ALTURA)
+        self.objeto.desenhar_angulo()
+
+        self.resetar_tentativa()
+
+        self.estado_atual["configurar"] = not self.input()
+        if not self.estado_atual["configurar"]:
+            self.proximo_estado = self.jogar
+            self.estado_atual["jogar"] =  True
+            self.tentativas.tentativas += 1
+
+    def jogar(self):    
+        dt = clock.tick(120) / 350
+        self.t += dt
+
+        if self.alvo.checar_proximidade(self.objeto.x, self.objeto.y):
+            self.acertou = True
+
+        self.objeto.desenhar_trajetoria(self.t)
+        self.objeto.atualizar_posicao(self.t)
+
+        if not self.objeto.naTela() or self.objeto.checar_colisao():
+            self.estado_atual["jogar"] = False
+            if self.acertou:
+                self.estado_atual["vitoria"] = True
+                self.proximo_estado = self.vitoria
+            elif self.tentativas.tentativas >= 3:
+                self.estado_atual["derrota"] = True
+                self.proximo_estado = self.derrota
+            else:
+                self.estado_atual["configurar"] = True
+                self.proximo_estado = self.configurar
+
+    def vitoria(self):
+        self.placar += 1
+        self.estado_atual["vitoria"] = False
+        self.proximo_estado = self.resetar
+
+    def derrota(self):
+        self.placar = 0
+        self.estado_atual["derrota"] = False
+        self.proximo_estado = self.resetar
+
+    def executar_proximo_estado(self):
+        self.proximo_estado()
+
+    #--- Loop do jogo
     def loop(self):
         tela.fill("#202020")
-
-        dt = clock.tick(120) / 350
-        if (self.em_movimento and not self.pausado):
-            self.t += dt
-
-        while(self.menu): 
-            self.mostrar_menu()
-            
-        self.input()
-        self.informacoes()
-
-        if (not self.em_movimento):
-            mostrar_texto(1, "Configure as condições iniciais", 0.5*LARGURA,0.15*ALTURA )
-            
-        self.objeto.atualizar(self, self.alvo)
-
-        self.verificar_jogada()
         
-        if (self.pausado):
-            mostrar_texto(1, "Pausado", 0.5*LARGURA,0.08*ALTURA)
+        self.proximo_estado()
 
-        if (DEBUG):
-            if (self.acertou):
-                mostrar_texto(2, "Acertou", 0.5*LARGURA,0.5*ALTURA)
+        if (not self.estado_atual["menu"] and not self.estado_atual["configurar"]):
+            self.informacoes()
 
-            mostrar_texto(2, f"{self.em_movimento} {self.pausado}", 0.5*LARGURA,0.3*ALTURA)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.loop_jogo = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    self.loop_jogo = False
 
         pygame.display.update()
         pygame.display.flip()
 
         clock.tick(120)
-        
   
+
 jogo = Jogo()
 
 while(jogo.loop_jogo):
