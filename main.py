@@ -178,13 +178,24 @@ class Alvo:
         
         self.rect = pygame.Rect(self.x0, self.y0, 50, 50)
 
-    # Checa se o ponto (x, y) está a uma distância do alvo
-    def checar_proximidade(self, x, y):
-        dist = np.sqrt((x - self.x0)**2 + (y-self.y0)**2)
-        # print(dist)
-        if (dist < 50):
+    # Checa se o alvo intersecta o objeto
+    def checar_proximidade(self, x, y, raio):
+        # Coordenadas do alvo
+        x_min = self.rect.left
+        x_max = self.rect.right
+        y_min = self.rect.top
+        y_max = self.rect.bottom
+
+        # Encontrar o ponto mais próximo no quadrado
+        p_x = max(x_min, min(x, x_max))
+        p_y = max(y_min, min(y, y_max))
+
+        # Calcular a distância entre o círculo e o ponto mais próximo
+        distancia = math.sqrt((x - p_x)** 2 + (y - p_y)** 2)
+
+        if distancia <= raio:
             self.cor = "cyan"
-            return True
+            return True 
         
         self.cor = "green"
         return False
@@ -329,7 +340,7 @@ class Jogo:
         dt = clock.tick(120) / 350
         self.t += dt
 
-        if self.alvo.checar_proximidade(self.objeto.x, self.objeto.y):
+        if self.alvo.checar_proximidade(self.objeto.x, self.objeto.y, self.objeto.raio):
             self.acertou = True
 
         self.objeto.desenhar_trajetoria(self.t)
