@@ -95,7 +95,7 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
 - Instale os pacotes mencionados na seção anterior.
 - Faça o download dos assets necessários, presentes na seção *assets/font* do projeto no GitHub.
 
-- **Exemplos de Uso:**  
+- **Exemplo de Uso:**  
   - Para rodar a simulação básica, utilize o código:
     ```python
       python3 main.py
