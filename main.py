@@ -1,3 +1,17 @@
+"""
+Nome do Projeto: Acerto ao Alvo. 
+
+Descrição: Um jogo cujo objetivo principal é que um alvo colocado em posição aleatória seja atingido por uma bola. Para que isso aconteça, o jogador deve controlar o vetor velocidade (módulo, direção e sentido) do objeto lançado.
+A modelagem física do jogo simula um lançamento oblíquo, estando todos os corpos móveis sujeitos à ação de um campo gravitacional constante e, portanto, percorrendo uma trajetória parabólica, que é desenhada na tela.
+
+Autores: 
+  Raí Fernando Dal Prá - 15506968
+  Lucas Dúckur Nunes Andreolli - 15471518
+  Yan Trindade Meireles - 13680035
+  Rafael Perez Carmanhani - 15485420
+  
+Este projeto faz parte do processo avaliativo da disciplina 7600105 - Física Básica I (2024) da USP-São Carlos ministrada pela Prof. Krissia de Zawadzki.
+"""
 import pygame
 import numpy as np
 import random
