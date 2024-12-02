@@ -12,6 +12,8 @@ Autores:
   
 Este projeto faz parte do processo avaliativo da disciplina 7600105 - Física Básica I (2024) da USP-São Carlos ministrada pela Prof. Krissia de Zawadzki.
 """
+
+# Importação de bibliotecas necessárias
 import pygame
 import numpy as np
 import random
@@ -20,15 +22,19 @@ import os
 
 pygame.init()
 
-RESOLUCAO = (1280, 720)
+# --- Configurações iniciais do jogo ---
+RESOLUCAO = (1280, 720) # Dimensão da janela do jogo.
 
 LARGURA = RESOLUCAO[0]
 ALTURA = RESOLUCAO[1]
-tela = pygame.display.set_mode(RESOLUCAO)
-clock = pygame.time.Clock()
+tela = pygame.display.set_mode(RESOLUCAO) # Inicializa a tela.
+clock = pygame.time.Clock() # Configura o controle de FPS.
 pygame.display.set_caption("Projeto Final Física Básica")
 
 def mostrar_texto(tam, texto, x, y, customizado=0, cor="white"):
+    """
+    Renderiza texto na tela em uma posição e tamanho específicos.
+    """
     tamanhos = [10, 30, 60, 75]
     tamanho_fonte = int(LARGURA/tamanhos[tam])
     if customizado:
@@ -42,17 +48,25 @@ def mostrar_texto(tam, texto, x, y, customizado=0, cor="white"):
 
 
 class Objeto:
+    """
+    Representa o objeto lançado pelo jogador (bola).
+    Modelagem física baseada em lançamento oblíquo:
+    - Velocidade inicial (vetorial): composta por ângulo e módulo.
+    - Aceleração gravitacional constante.
+    - Movimento descrito por funções quadráticas para a posição.
+    """
+  
     def __init__(self):
-        self.angulo = 0.0 # em radiano
-        self.tamanho_seta = 100
+        self.angulo = 0.0 # Ângulo do lançamento (em radianos).
+        self.tamanho_seta = 100 # Tamanho do vetor que indica a direção do lançamento.
 
-        self.x0, self.y0 = -300, -300
+        self.x0, self.y0 = -300, -300 # Posição inicial do objeto.
         self.velocidade = 0
         self.velocidade_maxima = 945
-        self.x, self.y = self.x0, self.y0
+        self.x, self.y = self.x0, self.y0 # Posição atual do objeto.
         self.arrastar = False
-        self.gravidade = 370
-        self.raio = 20
+        self.gravidade = 370 # Aceleração gravitacional.
+        self.raio = 20 # Raio do objeto (usado para colisões).
         self.cor = "purple"
 
         self.trajetoria = []
@@ -60,13 +74,18 @@ class Objeto:
         self.tempo_trajetoria = self.variacao_tempo_trajetoria
 
     def desenhar_angulo(self):
+        """
+        Desenha o vetor representando a direção e força do lançamento.
+        """
+      
         self.tamanho_seta = min(90, max(40, math.pow(self.velocidade**2, 0.34)))
         novo_x = self.x0 + self.tamanho_seta*np.cos(self.angulo)
         novo_y = self.y0 + self.tamanho_seta*np.sin(self.angulo)
 
+        # Desenha a linha principal do vetor.
         self.linha_angulo = pygame.draw.line(tela, self.cor, (self.x0, self.y0), (novo_x, novo_y), 5)
 
-        # Abas da seta do ângulo
+        # Desenha as abas da seta (indicador de sentido).
         tamanho_abas = 15
         angulo_abas = np.radians(15)
 
@@ -81,6 +100,10 @@ class Objeto:
         pygame.draw.line(tela, self.cor, (novo_x, novo_y), (direita_x, direita_y), 5)
 
     def aleatorizar_posicao(self, nivel):
+        """
+        Define a posição inicial do objeto com base no nível atual.
+        """
+      
         posicao_x = posicao_y = 0
         nivel = (nivel % 5) + 1 
         
@@ -136,6 +159,10 @@ class Objeto:
         self.desenhar()
 
     def checar_colisao(self):
+        """
+        Verifica se o objeto colidiu com o chão (linha de plataforma).
+        """
+      
         esquerda, direita = self.x0-30, self.x0+30
         altura = self.y0+self.raio
 
@@ -177,7 +204,12 @@ class Objeto:
         self.velocidade = min(dist*np.sqrt(3/0.5), self.velocidade_maxima) 
         
 
+# --- Classe Alvo ---
 class Alvo:
+    """
+    Representa o alvo que o jogador deve atingir.
+    """
+  
     def __init__(self):
         self.x0, self.y0 = -500, -500
         self.largura = 50
@@ -192,6 +224,10 @@ class Alvo:
         pygame.draw.rect(tela, self.cor, self.rect)
 
     def aleatorizar_posicao(self, objeto:Objeto, nivel):
+        """
+        Define uma nova posição aleatória para o alvo, evitando colisões com o objeto.
+        """
+      
         posicao_x = posicao_y = 0
         
         if (nivel % 5 == 0):
@@ -259,15 +295,23 @@ class Alvo:
 
         return distancia <= raio
         
-    
+
+# --- Classe Tentativas ---
 class Tentativas:
+    """
+    Representa as tentativas restantes do jogador.
+    """
+  
     def __init__(self):
-        self.tentativas = 0
-        self.raio = 10
+        self.tentativas = 0 # Tentativas usadas.
+        self.raio = 10 # Raio dos círculos que representam as tentativas na tela.
         self.borda = 1
         self.origem = (30, 30)
 
     def mostrar(self):
+        """
+        Exibe os indicadores de tentativas na tela.
+        """
         for i in range(0, 3):
             preencher = 0 if i < self.tentativas else self.borda
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
@@ -276,7 +320,12 @@ class Tentativas:
     
 DEBUG = False
 
+# --- Classe Jogo ---
 class Jogo:
+    """
+    Gerencia o fluxo do jogo (estados, pontuação e interação do jogador).
+    """
+  
     def __init__(self):
         # Lógica do loop do jogo (estados)
         self.loop_jogo = True
@@ -299,10 +348,10 @@ class Jogo:
         self.alvo = Alvo()
         self.tentativas = Tentativas()
 
-        self.placar = 0
-        self.recorde = 0
+        self.placar = 0 # Pontuação do jogador.
+        self.recorde = 0 # Recorde de maior pontuação até o momento.
         self.novo_recorde = False
-        self.nivel = 1
+        self.nivel = 1 # Nível atual.
 
     #--- Funções auxiliares
     def salvar_recorde(self):
@@ -473,13 +522,20 @@ class Jogo:
             self.proximo_estado = self.resetar
 
     def executar_proximo_estado(self):
+        """
+        Executa o próximo estado do jogo (menu, configurar, jogar, etc.).
+        """
         self.proximo_estado()
 
     #--- Loop do jogo
     def loop(self):
-        tela.fill("#202020")
+        """
+        Loop principal do jogo.
+        """
+      
+        tela.fill("#202020") # Limpa a tela.
         
-        self.proximo_estado()
+        self.proximo_estado() # Atualiza o estado atual.
 
         if (not self.estado_atual["menu"] and not self.estado_atual["configurar"] and not self.estado_atual["derrota"]):
             self.informacoes()
@@ -494,7 +550,7 @@ class Jogo:
         pygame.display.update()
         pygame.display.flip()
 
-        clock.tick(120)
+        clock.tick(120) # Mantém o jogo em 120 FPS.
   
 
 jogo = Jogo()
