@@ -36,7 +36,7 @@ $$ \begin{align}
   y(t) &= d + v_{0}\sin\theta\cdot t - \displaystyle\frac{gt^{2}}{2} \\
  \end{align} $$
 
- onde c e d são constantes arbitrárias. Para determiná-las, usam-se as condições iniciais $x(0) = x_{0}$ e $y(0) = y_{0}$, de onde c = x_{0} e d = y_{0}. Logo, a trajetória do projétil é dada pelas equações:
+ onde c e d são constantes arbitrárias. Para determiná-las, usam-se as condições iniciais $x(0) = x_{0}$ e $y(0) = y_{0}$, de onde c = $x_{0}$ e d = $y_{0}$. Logo, a trajetória do projétil é dada pelas equações:
 
  $$ \fbox{$
  \begin{align} 
@@ -79,6 +79,14 @@ $$ \begin{equation}
 v_{0} = v(t_{f}) \approx \Delta x\sqrt{\displaystyle\frac{k}{m}}  
 \end{equation}$$
 
+A **Figura 2** ilustra o funcionamento do estilingue, representando a deformação $\Delta x$, a variação da altura $\Delta y$, e o vetor velocidade $v_{f}$ obtido quando o objeto é lançado.
+
+  <p align="center">
+  <img src="Imagens/estilingue.png" alt="Descrição da imagem">
+  <em>Figura 2: representação visual do funcionamento do estilingue. Imagem adaptada da internet.</em>
+  <br>
+</p>
+
 Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos interessa e, uma vez que a massa do objeto é constante e inacessível ao usuário, $m$ também não interessa. Portanto, o módulo da velocidade inicial é diretamente proporcional à deformação (no jogo, à distância entre o *mouse* e o objeto) e assim:
 
  $$ \fbox{$
@@ -120,6 +128,7 @@ Este projeto foi desenvolvido por:
 
  ## Referências: 
  (1) Bernardes, E. de S. (2024). Dinâmica-v4 (Notas de aula). 7600105 - Física Básica I. Universidade de São Paulo, São Carlos.
+ 
   
 
 
