@@ -46,6 +46,14 @@ $$ \begin{align}
   $}
   $$
 
+  As equações obtidas para a trajetória do projétil descrevem um movimento parabólico. Um exemplo desse movimento é dado na **Figura 1**, em que se considera um lançamento oblíquo de velocidade inicial $v_{0} = 20m/s$ e ângulo inicial de 45°.
+
+  <p align="center">
+  <img src="Imagens/ProjetilExv2.png" alt="Descrição da imagem">
+  <em>Figura 1: exemplo de trajetória de lançamento oblíquo. Gráfico criado com uso da biblioteca Matplotlib.</em>
+  <br>
+</p>
+
   ## Modelagem matemática da escolha da velocidade e do ângulo iniciais
  
  As equações obtidas para a trajetória do objeto lançado dependem do módulo do vetor velocidade inicial e do ângulo que esse vetor faz com o eixo $x$. É necessário, por conseguinte, que o usuário escolha esses valores. Para tal, foi desenvolvido um sistema que se assemelha a um estilingue: o usuário clica no objeto e, à medida que arrasta o *mouse*, controla o módulo do vetor e o ângulo que ele faz com o eixo das abcissas.
