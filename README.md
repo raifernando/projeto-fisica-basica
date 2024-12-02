@@ -136,7 +136,7 @@ Este projeto foi desenvolvido por:
       Lucas Dúckur Nunes Andreolli: 15471518 - lucas.andreolli@usp.br
       Raí Fernando Dal Prá: 15506968 -
       Yan Trindade Meireles: 13680035 - yan.trindade@usp.br
-      Rafael Perez Carmanhani: 15485420 -
+      Rafael Perez Carmanhani: 15485420 - rcarmanhani@usp.br
     
   Para ser entregue como o projeto final que faz parte  do processo avaliativo da disciplina 7600105 - Física Básica I (2024) da USP-São Carlos ministrada pelos professores Krissia de Zawadzki e Esmerindo de Sousa Bernardes.
 
