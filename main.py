@@ -34,9 +34,10 @@ class Objeto:
 
         self.x0, self.y0 = -300, -300
         self.velocidade = 0
+        self.velocidade_maxima = 945
         self.x, self.y = self.x0, self.y0
         self.arrastar = False
-        self.gravidade = 200
+        self.gravidade = 370
         self.raio = 20
         self.cor = "purple"
 
@@ -135,7 +136,7 @@ class Objeto:
         velocidade_convertida = self.velocidade*0.026458 #conversão de pixels por segundo para cm/s
         
         angulo = f"ângulo: {angulo_graus:.2f}°"
-        velocidade = f"velocidadade: {velocidade_convertida:.2f} cm/s"
+        velocidade = f"velocidadade: {velocidade_convertida:.2f} m/s"
 
         mostrar_texto(3, angulo + " | " + velocidade, 0.5*LARGURA,0.95*ALTURA)
 
@@ -159,7 +160,7 @@ class Objeto:
         dist = math.hypot(dx, dy)
 
         #formula obtida da conservacao de energia: o valor de cima é a constantes elastica, o de baixo a massa
-        self.velocidade = min(dist*np.sqrt(3/0.5), 800) 
+        self.velocidade = min(dist*np.sqrt(3/0.5), self.velocidade_maxima) 
         
 
 class Alvo:
@@ -334,9 +335,9 @@ class Jogo:
         keys = pygame.key.get_pressed()
         
         if keys[pygame.K_UP]:
-            self.objeto.velocidade = min(800, max(0, self.objeto.velocidade+3))
+            self.objeto.velocidade = min(self.objeto.velocidade_maxima, max(0, self.objeto.velocidade+3))
         if keys[pygame.K_DOWN]:
-            self.objeto.velocidade = min(800, max(0, self.objeto.velocidade-3))
+            self.objeto.velocidade = min(self.objeto.velocidade_maxima, max(0, self.objeto.velocidade-3))
         if keys[pygame.K_LEFT]:
             self.objeto.angulo -= np.radians(1)
         if keys[pygame.K_RIGHT]:
