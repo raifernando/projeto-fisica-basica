@@ -56,11 +56,11 @@ $$ \begin{align}
 \Delta T = -\Delta U = - (\Delta U_{g} + \Delta U_{e})
  \end{align} $$
 
- onde $U_{g}$ e $U_{e}$ são, respectivamente, as energias potenciais gravitacional e elástica do sistema. Aqui será feita uma aproximação: supõe-se que a variação $\Delta y$ da altura do objeto seja suficientemente pequena para que $\Delta U_{g} << \Delta U_{e}$. Logo, se supormos que o objeto está em repouso no início da deformação, que a deformação inicial é nula, considerando o tempo $t_{f}$ de fim da deformação e início do lançamento do projétil, e $\Delta x$ a deformação final:
+ onde $U_{g}$ e $U_{e}$ são, respectivamente, as energias potenciais gravitacional e elástica do sistema. Aqui será feita uma aproximação: supõe-se que a variação $\Delta y$ da altura do objeto seja suficientemente pequena para que $\Delta U_{g} << \Delta U_{e}$. Logo, se supormos que o objeto está em repouso no início da deformação e que a deformação inicial é nula, considerando o tempo $t_{f}$ de fim da deformação e início do lançamento do projétil e $\Delta x$ a deformação final:
 
 $$ \begin{align}
 T(t_{f}) - T(0) &\approx - (U_{e}(t_{f}) - U_{e}(0)) \\
-T(t_{f}) &\approx - U_{e}(t_{f}) \\
+|T(t_{f})| &\approx |U_{e}(t_{f})| \\
 \displaystyle\frac{m(v(t_{f}))^{2}}{2} &\approx \displaystyle\frac{k(\Delta x)^{2}}{2} \\
 v(t_{f}) &\approx \Delta x\sqrt{\displaystyle\frac{k}{m}}
  \end{align} $$
@@ -71,7 +71,7 @@ $$ \begin{equation}
 v_{0} = v(t_{f}) \approx \Delta x\sqrt{\displaystyle\frac{k}{m}}  
 \end{equation}$$
 
-Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos interessa e, uma vez que a massa do objeto é constante e inacessível ao usuário, $m$ também não interessa. Portanto, o módulo da velocidade inicial é diretamente proporcional à deformação (noo jogo, à distância entre o *mouse* e o objeto) e assim:
+Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos interessa e, uma vez que a massa do objeto é constante e inacessível ao usuário, $m$ também não interessa. Portanto, o módulo da velocidade inicial é diretamente proporcional à deformação (no jogo, à distância entre o *mouse* e o objeto) e assim:
 
  $$ \fbox{$
  \begin{equation} 
