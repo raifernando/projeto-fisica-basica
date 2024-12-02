@@ -1,6 +1,13 @@
 # Lançamento oblíquo
 ## Descrição básica do jogo 
-Este projeto é um jogo em que o jogador controla o ângulo e a velocidade inicial do lançamento de um projétil circular de forma a tentar acertar um alvo que está em uma posição aleatória. Cada acerto é contabilizado e, após três erros, o contador é resetado. O objetivo é conseguir o maior número de acertos, sendo que o recorde é sempre atualizado a cada jogada.
+Este projeto é um jogo em que o jogador controla o ângulo e a velocidade inicial do lançamento de um projétil circular de forma a tentar acertar um alvo que está em uma posição aleatória. Cada acerto é contabilizado e, após três erros, o contador é resetado. O objetivo é conseguir o maior número de acertos, sendo que o recorde é sempre atualizado a cada jogada. A **Figura 1** demonstra a tela de jogo, em que o usuário já pode lançar o projétil a seu gosto.
+
+  <p align="center">
+  <img src="Imagens/jogo.png" alt="Descrição da imagem">
+  <em>Figura 1: momento capturado durante uma sessão de jogo.</em>
+  <br>
+</p>
+
 
 O lançamento do projétil é, na realidade, um caso particular de lançamento oblíquo: um objeto é lançado com um vetor velocidade inicial $$\vec{v_{0}}$$ e, a partir da ação da força de atração gravitacional direcionada ao centro da Terra (força peso), tem sua trajetória determinada. Foi feito, assim, uma modelagem matemática do lançamento e outra para se determinar o vetor $\vec{v_{0}}$, as quais foram implementadas em Python. 
 
@@ -46,11 +53,11 @@ $$ \begin{align}
   $}
   $$
 
-  As equações obtidas para a trajetória do projétil descrevem um movimento parabólico. Um exemplo desse movimento é dado na **Figura 1**, em que se considera um lançamento oblíquo de velocidade inicial $v_{0} = 20m/s$ e ângulo inicial de 45°.
+  As equações obtidas para a trajetória do projétil descrevem um movimento parabólico. Um exemplo desse movimento é dado na **Figura 2**, em que se considera um lançamento oblíquo de velocidade inicial $v_{0} = 20m/s$ e ângulo inicial de 45°.
 
   <p align="center">
   <img src="Imagens/ProjetilExv2.png" alt="Descrição da imagem">
-  <em>Figura 1: exemplo de trajetória de lançamento oblíquo. Gráfico criado com uso da biblioteca Matplotlib.</em>
+  <em>Figura 2: exemplo de trajetória de lançamento oblíquo. Gráfico criado com uso da biblioteca Matplotlib.</em>
   <br>
 </p>
 
@@ -79,11 +86,11 @@ $$ \begin{equation}
 v_{0} = v(t_{f}) \approx \Delta x\sqrt{\displaystyle\frac{k}{m}}  
 \end{equation}$$
 
-A **Figura 2** ilustra o funcionamento do estilingue, representando a deformação $\Delta x$, a variação da altura $\Delta y$, e o vetor velocidade $v_{f}$ obtido quando o objeto é lançado.
+A **Figura 3** ilustra o funcionamento do estilingue, representando a deformação $\Delta x$, a variação da altura $\Delta y$, e o vetor velocidade $v_{f}$ obtido quando o objeto é lançado.
 
   <p align="center">
   <img src="Imagens/estilingue.png" alt="Descrição da imagem">
-  <em>Figura 2: representação visual do funcionamento do estilingue. Imagem adaptada da internet.</em>
+  <em>Figura 3: representação visual do funcionamento do estilingue. Imagem adaptada da internet.</em>
   <br>
 </p>
 
@@ -116,13 +123,13 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
     ```python
       python3 main.py
     ```
-
+## Projeto
 Este projeto foi desenvolvido por:
   
       Lucas Dúckur Nunes Andreolli: lucas.andreolli@usp.br
-      --
-      --
-      --
+      Raí Fernando Dal Prá
+      Yan Trindade Meireles
+      Rafael Perez Carmanhani
     
   Para ser entregue como o projeto final que faz parte  do processo avaliativo da disciplina 7600105 - Física Básica I (2024) da USP-São Carlos ministrada pelos professores Krissia de Zawadzki e Esmerindo de Sousa Bernardes.
 
