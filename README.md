@@ -120,7 +120,7 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
       pip install pygame
       pip install numpy
      ```
-  - Lembre-se de ter todos os recursos gráficos baixados no seu computador
+- Lembre-se de ter todos os recursos gráficos baixados no seu computador
     - No mesmo diretório de main.py crie a pasta /assets/
     - Baixe o arquivo da fonte em /assets/font/
     - Baixe as imagens usadas no jogo em /assets/img/
