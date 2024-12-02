@@ -25,6 +25,7 @@ pygame.init()
 # --- Configurações iniciais do jogo ---
 RESOLUCAO = (1280, 720) # Dimensão da janela do jogo.
 
+
 LARGURA = RESOLUCAO[0]
 ALTURA = RESOLUCAO[1]
 tela = pygame.display.set_mode(RESOLUCAO) # Inicializa a tela.
@@ -66,12 +67,17 @@ class Objeto:
         self.x, self.y = self.x0, self.y0 # Posição atual do objeto.
         self.arrastar = False
         self.gravidade = 370 # Aceleração gravitacional.
-        self.raio = 20 # Raio do objeto (usado para colisões).
-        self.cor = "purple"
+        self.cor = pygame.Color("#ab6202")
 
         self.trajetoria = []
         self.variacao_tempo_trajetoria = 0.05
         self.tempo_trajetoria = self.variacao_tempo_trajetoria
+
+        self.imagem_rock = pygame.image.load("assets/img/rock.png")  # Caminho da imagem
+        self.imagem_rock = pygame.transform.scale(self.imagem_rock, (50, 50))  # Redimensionar (ajustar conforme necessário)
+        self.raio = self.imagem_rock.get_width() // 2
+        self.largura_imagem = self.imagem_rock.get_width()
+        self.altura_imagem = self.imagem_rock.get_height()
 
     def desenhar_angulo(self):
         """
@@ -134,10 +140,8 @@ class Objeto:
         self.x, self.y = self.x0, self.y0
 
     def desenhar(self):
-        self.circulo = pygame.draw.circle(tela, self.cor, (self.x, self.y), self.raio)
+        tela.blit(self.imagem_rock, (self.x - self.imagem_rock.get_width() // 2, self.y - self.imagem_rock.get_height() // 2))
 
-        # Plataforma
-        pygame.draw.line(tela, self.cor, (self.x0-30, self.y0+self.raio), (self.x0+30, self.y0+self.raio), 5)
 
     def desenhar_trajetoria(self, t):
         if (t >= self.tempo_trajetoria):
@@ -214,6 +218,8 @@ class Alvo:
         self.x0, self.y0 = -500, -500
         self.largura = 50
         self.cor = "cyan"
+        self.imagem_alvo = pygame.image.load("assets/img/target.png")  # Substitua pelo caminho correto
+        self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura*1.5, self.largura*1.5))
         self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
     
     def resetar(self):
@@ -221,7 +227,7 @@ class Alvo:
         self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
 
     def desenhar(self):
-        pygame.draw.rect(tela, self.cor, self.rect)
+        tela.blit(self.imagem_alvo, (self.rect.centerx - self.imagem_alvo.get_width() // 2, self.rect.centery - self.imagem_alvo.get_height() // 2))
 
     def aleatorizar_posicao(self, objeto:Objeto, nivel):
         """
@@ -328,6 +334,8 @@ class Jogo:
   
     def __init__(self):
         # Lógica do loop do jogo (estados)
+        self.fundo = pygame.image.load("assets/img/bg.jpg").convert()
+        self.fundo = pygame.transform.scale(self.fundo, (LARGURA, ALTURA))
         self.loop_jogo = True
         
         self.estado_atual = {
@@ -532,8 +540,7 @@ class Jogo:
         """
         Loop principal do jogo.
         """
-      
-        tela.fill("#202020") # Limpa a tela.
+        tela.blit(self.fundo, (0, 0))
         
         self.proximo_estado() # Atualiza o estado atual.
 
