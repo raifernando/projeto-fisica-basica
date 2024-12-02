@@ -113,23 +113,21 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
 
 ## Como usar
 
-- **Instalação e Dependências:**
-- É necessário que alguma versão da linguagem Python3 esteja instalada.
+- É necessário que a versão 3.10, ou superior, da linguagem Python esteja instalada.
 - Instale os pacotes mencionados na seção anterior com o pip:
-   ```python
+   ```console
       pip install pygame
       pip install numpy
      ```
-- Lembre-se de ter todos os recursos gráficos baixados no seu computador
-    - No mesmo diretório de main.py crie a pasta /assets/
-    - Baixe o arquivo da fonte em /assets/font/
-    - Baixe as imagens usadas no jogo em /assets/img/
-
-- **Exemplo de Uso:**
-  - Para rodar a simulação básica, utilize o código:
-    ```python
-      python3 main.py
+- Baixe todos os arquivos necessários para o funcionamento do programa com:
+    ```console
+      git clone https://github.com/raifernando/projeto-fisica-basica.git
     ```
+    
+- Para rodar o jogo, utilize o código:
+  ```console
+    python3 main.py
+  ```
 ## Projeto
 Este projeto foi desenvolvido por:
   
