@@ -3,7 +3,7 @@
 Este projeto é um jogo em que o jogador controla o ângulo e a velocidade inicial do lançamento de um projétil circular de forma a tentar acertar um alvo que está em uma posição aleatória. Cada acerto é contabilizado e, após três erros, o contador é resetado. O objetivo é conseguir o maior número de acertos, sendo que o recorde é sempre atualizado a cada jogada. A **Figura 1** demonstra a tela de jogo, em que o usuário já pode lançar o projétil a seu gosto.
 
   <p align="center">
-  <img src="Imagens/jogo.png" alt="Descrição da imagem">
+  <img src="Imagens/in-game.png" alt="Descrição da imagem">
   <em>Figura 1: momento capturado durante uma sessão de jogo.</em>
   <br>
 </p>
