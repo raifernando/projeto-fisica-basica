@@ -115,10 +115,17 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
 
 - **Instalação e Dependências:**
 - É necessário que alguma versão da linguagem Python3 esteja instalada.
-- Instale os pacotes mencionados na seção anterior.
-- Faça o download dos assets necessários, presentes na seção *assets/font* do projeto no GitHub.
+- Instale os pacotes mencionados na seção anterior com o pip:
+   ```python
+      pip install pygame
+      pip install numpy
+     ```
+  - Lembre-se de ter todos os recursos gráficos baixados no seu computador
+    - No mesmo diretório de main.py crie a pasta /assets/
+    - Baixe o arquivo da fonte em /assets/font/
+    - Baixe as imagens usadas no jogo em /assets/img/
 
-- **Exemplo de Uso:**  
+- **Exemplo de Uso:**
   - Para rodar a simulação básica, utilize o código:
     ```python
       python3 main.py
@@ -126,10 +133,10 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
 ## Projeto
 Este projeto foi desenvolvido por:
   
-      Lucas Dúckur Nunes Andreolli: lucas.andreolli@usp.br
-      Raí Fernando Dal Prá
-      Yan Trindade Meireles
-      Rafael Perez Carmanhani
+      Lucas Dúckur Nunes Andreolli: 15471518 - lucas.andreolli@usp.br
+      Raí Fernando Dal Prá: 15506968 -
+      Yan Trindade Meireles: 13680035 - yan.trindade@usp.br
+      Rafael Perez Carmanhani: 15485420 -
     
   Para ser entregue como o projeto final que faz parte  do processo avaliativo da disciplina 7600105 - Física Básica I (2024) da USP-São Carlos ministrada pelos professores Krissia de Zawadzki e Esmerindo de Sousa Bernardes.
 
