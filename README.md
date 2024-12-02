@@ -9,7 +9,13 @@ Este projeto é um jogo em que o jogador controla o ângulo e a velocidade inici
 </p>
 
 
-O lançamento do projétil é, na realidade, um caso particular de lançamento oblíquo: um objeto é lançado com um vetor velocidade inicial $$\vec{v_{0}}$$ e, a partir da ação da força de atração gravitacional direcionada ao centro da Terra (força peso), tem sua trajetória determinada. Foi feito, assim, uma modelagem matemática do lançamento e outra para se determinar o vetor $\vec{v_{0}}$, as quais foram implementadas em Python. 
+O lançamento do projétil é, na realidade, um caso particular de lançamento oblíquo: um objeto é lançado com um vetor velocidade inicial $$\vec{v_{0}}$$ e, a partir da ação da força de atração gravitacional direcionada ao centro da Terra (força peso), tem sua trajetória determinada. Foi feito, assim, uma modelagem matemática do lançamento e outra para se determinar o vetor $\vec{v_{0}}$, as quais foram implementadas em Python.
+
+## Como jogar
+Com o jogo já aberto, basta apertar qualquer tecla para iniciar. 
+Utilizando o mouse, clique na rocha e arraste no sentido oposto do desejado (como se fosse um estilingue). Quanto mais você arrastar, maior será a velocidade inicial da rocha, que fica indicada na parte inferior da tela. O ângulo é controlado pela direção do mouse, e também fica indicado no canto inferior da tela. Outra opção é jogar usando apenas o teclado. Use as setas para direita e esquerda para ajustar o ângulo do lançamento. Use as setas para cima e para baixo para escolher a velocidade inicial do lançamento. Para lançar a rocha, aperte espaço
+
+O jogo acaba quando o jogador erra o alvo 3 vezes seguidas. O recorde pessoal fica guardado para as próximas vezes que o usuário for jogar.
 
 ## Modelagem matemática do lançamento oblíquo
 Considere um sistema de coordenadas cartesiano bidimensional em que o canto inferior esquerdo da tela é a origem. Sejam $\hat{i}$ e $\hat{j}$ as direções, respectivamente, do eixo $x$ (para a esquerda - sentido positivo) e do eixo $y$ (para cima - sentido positivo). Considere ainda um objeto de massa $m$, lançado da posição $(x_{0}, y_{0})$ (no sistema de coordenadas definido) com um vetor velocidade inicial $\vec{v_{0}}$. Sua posição é denotada por $(x(t), y(t))$, em que $t$ é o parâmetro de tempo.
