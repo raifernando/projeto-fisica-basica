@@ -323,9 +323,6 @@ class Tentativas:
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
 
 
-    
-DEBUG = False
-
 # --- Classe Jogo ---
 class Jogo:
     """
