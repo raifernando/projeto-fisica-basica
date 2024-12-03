@@ -22,6 +22,7 @@ import os
 
 pygame.init()
 
+
 # --- Configurações iniciais do jogo ---
 RESOLUCAO = (1280, 720) # Dimensão da janela do jogo.
 
@@ -217,11 +218,12 @@ class Alvo:
   
     def __init__(self):
         self.x0, self.y0 = -500, -500
-        self.largura = 50
+        self.largura = 100
         self.cor = "cyan"
         self.imagem_alvo = pygame.image.load("assets/img/target.png")  # Substitua pelo caminho correto
-        self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura*1.5, self.largura*1.5))
+        self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura, self.largura))
         self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
+        self.tentativas = Tentativas()
     
     def resetar(self):
         self.x0, self.y0 = 500, 500
@@ -237,11 +239,6 @@ class Alvo:
       
         posicao_x = posicao_y = 0
         
-        if (nivel % 5 == 0):
-            self.largura = max(self.largura - 3, 10)
-            self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
-
-        nivel = (nivel % 5) + 1 
 
         match nivel:
             case 1:
@@ -251,14 +248,25 @@ class Alvo:
                 x_esq = random.randint(int(0.3*LARGURA), int(max(objeto.x - 0.3*LARGURA, 0.3*LARGURA)))
                 x_dir = random.randint(int(min(objeto.x + 0.3*LARGURA, 0.8*LARGURA)), int(0.8*LARGURA))
 
+
                 posicao_x = random.choice([x_dir, x_esq])
                 posicao_y = random.choice([0.3, 0.5])*ALTURA 
+
+                if(self.largura > 100):
+                    self.largura = self.largura - 10
+                    self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
+                    self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura, self.largura))
             case 3:
                 x_esq = random.randint(int(0.1*LARGURA), int(max(objeto.x - 0.1*LARGURA, 0.1*LARGURA)))
                 x_dir = random.randint(int(min(objeto.x + 0.1*LARGURA, 0.9*LARGURA)), int(0.9*LARGURA))
 
                 posicao_x = random.choice([x_dir, x_esq])
-                posicao_y = random.choice([0.25, 0.5])*ALTURA 
+                posicao_y = random.choice([0.25, 0.5])*ALTURA
+
+                if(self.largura > 90):
+                    self.largura = self.largura - 10
+                    self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
+                    self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura, self.largura))
             
             case 4:
                 x_esq = random.randint(int(0.1*LARGURA), int(max(objeto.x - 0.1*LARGURA, 0.1*LARGURA)))
@@ -267,6 +275,11 @@ class Alvo:
                 posicao_x = random.choice([x_dir, x_esq])
                 posicao_y = random.choice([0.25, 0.6])*ALTURA
 
+                if(self.largura > 80):
+                    self.largura = self.largura - 5
+                    self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
+                    self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura, self.largura))
+            
             case 5:
                 x_esq = random.randint(int(0.2*LARGURA), int(0.3*LARGURA))
                 x_dir = random.randint(int(0.7*LARGURA), int(0.9*LARGURA))
@@ -277,6 +290,11 @@ class Alvo:
 
                 posicao_x = random.choice([x_dir, x_esq])
                 posicao_y = random.choice([y_cima, y_baixo])
+
+                if(self.largura > 70):
+                    self.largura = self.largura - 5
+                    self.rect = pygame.Rect(self.x0, self.y0, self.largura, self.largura)
+                    self.imagem_alvo = pygame.transform.scale(self.imagem_alvo, (self.largura, self.largura))
 
             case _:
                 posicao_x = random.randint(0.1*LARGURA, 0.9*LARGURA)
@@ -324,6 +342,9 @@ class Tentativas:
             pygame.draw.circle(tela, "white", (self.origem[0]*(i+1), self.origem[1]), radius=self.raio, width=preencher)
 
 
+    
+DEBUG = False
+
 # --- Classe Jogo ---
 class Jogo:
     """
@@ -332,6 +353,7 @@ class Jogo:
   
     def __init__(self):
         # Lógica do loop do jogo (estados)
+    
         self.fundo = pygame.image.load("assets/img/bg.jpg").convert()
         self.fundo = pygame.transform.scale(self.fundo, (LARGURA, ALTURA))
         self.loop_jogo = True
