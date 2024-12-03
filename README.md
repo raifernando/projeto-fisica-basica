@@ -18,7 +18,7 @@ Utilizando o mouse, clique na rocha e arraste no sentido oposto do desejado (com
 O jogo acaba quando o jogador erra o alvo 3 vezes seguidas. O recorde pessoal fica guardado para as próximas vezes que o usuário for jogar.
 
 ## Modelagem matemática do lançamento oblíquo
-Considere um sistema de coordenadas cartesiano bidimensional em que o canto inferior esquerdo da tela é a origem. Sejam $\hat{i}$ e $\hat{j}$ as direções, respectivamente, do eixo $x$ (para a esquerda - sentido positivo) e do eixo $y$ (para cima - sentido positivo). Considere ainda um objeto de massa $m$, lançado da posição $(x_{0}, y_{0})$ (no sistema de coordenadas definido) com um vetor velocidade inicial $\vec{v_{0}}$. Sua posição é denotada por $(x(t), y(t))$, em que $t$ é o parâmetro de tempo.
+Considere um sistema de coordenadas cartesiano bidimensional em que o canto inferior esquerdo da tela é a origem. Sejam $\hat{i}$ e $\hat{j}$ as direções, respectivamente, do eixo $x$ (para a direita - sentido positivo) e do eixo $y$ (para cima - sentido positivo). Considere ainda um objeto de massa $m$, lançado da posição $(x_{0}, y_{0})$ (no sistema de coordenadas definido) com um vetor velocidade inicial $\vec{v_{0}}$. Sua posição é denotada por $(x(t), y(t))$, em que $t$ é o parâmetro de tempo.
 
 A fim de simplificações, 	<ins> desconsidera-se a ação da resistência do ar </ins>. Assim, a única força atuante no sistema é a força peso, direcionada verticalmente para baixo. Logo, sendo $\vec{F}$(t) a força resultante e $\vec{F_{g}}(t)$ a força peso, de acordo com a segunda lei de Newton:
 
