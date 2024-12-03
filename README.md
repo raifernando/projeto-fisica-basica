@@ -138,7 +138,7 @@ Visto que o estilingue não existe realmente no jogo, a constante $k$ não nos i
 Este projeto foi desenvolvido por:
   
       Lucas Dúckur Nunes Andreolli: 15471518 - lucas.andreolli@usp.br
-      Raí Fernando Dal Prá: 15506968 -
+      Raí Fernando Dal Prá: 15506968 - raifernando@usp.br
       Yan Trindade Meireles: 13680035 - yan.trindade@usp.br
       Rafael Perez Carmanhani: 15485420 - rcarmanhani@usp.br
     
