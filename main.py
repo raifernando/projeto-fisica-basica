@@ -141,6 +141,7 @@ class Objeto:
 
     def desenhar(self):
         tela.blit(self.imagem_rock, (self.x - self.imagem_rock.get_width() // 2, self.y - self.imagem_rock.get_height() // 2))
+        pygame.draw.line(tela, self.cor, (self.x0-30, self.y0+self.raio), (self.x0+30, self.y0+self.raio), 5)
 
 
     def desenhar_trajetoria(self, t):
